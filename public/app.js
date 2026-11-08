@@ -1878,7 +1878,7 @@ $('#onbStart').addEventListener('click', () => { onbStep = 1; updateOnb(); });
 $('#onbNext').addEventListener('click', onbNext);
 $('#onbSkip').addEventListener('click', () => finishOnboarding(true));
 $('#restartOnb').addEventListener('click', () => { onbEditing = true; syncOnbFromState(); showOnb(1); });
-$('#editProfile').addEventListener('click', () => { onbEditing = true; syncOnbFromState(); showOnb(1); });
+$('#editProfile').addEventListener('click', openProfileSheet);
 /* ---------- mini sheet (custom habits & flashcards) ---------- */
 let miniEmoji = '✨';
 function openMini(){ $('#miniSheet').classList.add('open'); $('#miniBackdrop').classList.add('open'); }
@@ -1942,7 +1942,7 @@ function saveCard(){
   toast('Flashcard added to your deck', '🗂');
   haptic();
 }
-$('#addHabitBtn').addEventListener('click', openHabitSheet);
+$('#addHabitBtn').addEventListener('click', () => openHabitSheet());
 $('#addCardBtn').addEventListener('click', openCardSheet);
 $('#miniClose').addEventListener('click', closeMini);
 $('#miniBackdrop').addEventListener('click', closeMini);
