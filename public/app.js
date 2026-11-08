@@ -939,7 +939,7 @@ function renderHome(){
     <div class="divider"></div>
     <div class="row-between">
       <span class="tiny">${doneAssign} of ${state.assignments.length} assignments done</span>
-      <button class="btn ghost sm" data-nav="school">Open planner</button>
+      <button class="btn ghost sm" data-goto="school">Open planner</button>
     </div>`;
 
   /* water */
@@ -1765,8 +1765,8 @@ function tickClock(){
 }
 
 document.addEventListener('click', (e) => {
-  const nav = e.target.closest('[data-nav]');
-  if (nav) { showScreen(nav.dataset.nav); return; }
+  const nav = e.target.closest('[data-nav],[data-goto]');
+  if (nav) { showScreen(nav.dataset.nav || nav.dataset.goto); return; }
 
   const coachBtn = e.target.closest('[data-coach]');
   if (coachBtn) { askCoach(coachBtn.dataset.coach); return; }
