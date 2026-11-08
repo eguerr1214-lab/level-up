@@ -19,6 +19,56 @@
   <div class="noise"></div>
   <div class="top-scrim"></div>
 
+  <!-- ============ AUTH GATE ============ -->
+  <div class="auth" id="authGate" hidden>
+    <div class="auth-inner">
+      <div class="auth-brand">
+        <span class="auth-mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
+        <span>LEVEL UP</span>
+      </div>
+
+      <div class="auth-hero">
+        <div class="auth-eyebrow">YOUR AI PERSONAL COACH</div>
+        <h1>Level up your<br><span class="grad">whole life.</span></h1>
+        <p>Training, school, sport and habits — one plan that adapts to your week.</p>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-tabs" role="tablist" aria-label="Account access">
+          <button type="button" class="auth-tab active" data-auth-tab="signin" role="tab" aria-selected="true">Sign in</button>
+          <button type="button" class="auth-tab" data-auth-tab="signup" role="tab" aria-selected="false">Create account</button>
+        </div>
+
+        <form id="authForm" novalidate>
+          <div class="auth-field" data-signup-only hidden>
+            <label for="authName">Full name</label>
+            <input id="authName" name="name" type="text" autocomplete="name" placeholder="Alex Rivera" maxlength="40">
+          </div>
+          <div class="auth-field">
+            <label for="authEmail">Email</label>
+            <input id="authEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="120" required>
+          </div>
+          <div class="auth-field">
+            <label for="authPassword">Password</label>
+            <div class="auth-pass">
+              <input id="authPassword" name="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" maxlength="200" required>
+              <button type="button" class="auth-eye" id="authTogglePass" aria-label="Show password">Show</button>
+            </div>
+          </div>
+          <p class="auth-error" id="authError" role="alert"></p>
+          <button class="btn primary full" id="authSubmit" type="submit">Sign in</button>
+        </form>
+
+        <p class="auth-hint" id="authHint">New here? <button type="button" class="auth-link" data-auth-switch="signup">Create a free account</button></p>
+      </div>
+
+      <div class="auth-foot">
+        <button type="button" class="auth-demo" id="authDemo">Explore the demo without an account →</button>
+        <p class="auth-legal">By continuing you agree to our Terms and Privacy Policy.</p>
+      </div>
+    </div>
+  </div>
+
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
       <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4C8DFF"/><stop offset="100%" stop-color="#B98CFF"/></linearGradient>
@@ -348,13 +398,63 @@
         </div>
         <div class="setting">
           <div class="s-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4z"/></svg></div>
-          <div class="s-body"><b>Privacy</b><span>Data stays on this device</span></div>
-          <span class="pill-tag">Local</span>
+          <div class="s-body"><b>Privacy</b><span>Encrypted in transit · password hashed</span></div>
+          <span class="pill-tag">Secure</span>
+        </div>
+        <div class="setting" data-nav="billing" id="billingRow" role="button" tabindex="0">
+          <div class="s-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19"/><path d="M6.5 14.5h4"/></svg></div>
+          <div class="s-body"><b>Plan &amp; billing</b><span id="billingRowSub">Free plan</span></div>
+          <span class="pill-tag" id="billingRowPill">Free</span>
+        </div>
+        <div class="setting" id="accountRow">
+          <div class="s-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg></div>
+          <div class="s-body"><b id="accountName">Guest</b><span id="accountEmail">Demo mode · not saved</span></div>
+          <button class="pill-tag" id="signOutBtn" type="button">Sign out</button>
         </div>
       </div>
 
       <button class="btn ghost full" id="restartOnb" style="margin-top:4px">Redo personalization</button>
-      <div class="tiny center" style="margin-top:14px;line-height:1.6">LEVEL UP v1.0 · Built for your next level<br>Consistency over perfection.</div>
+      <div class="tiny center" style="margin-top:14px;line-height:1.6">LEVEL UP v2.0 · Built for your next level<br>Consistency over perfection.</div>
+    </section>
+
+    <!-- ============ BILLING ============ -->
+    <section class="screen screen-stagger" id="screen-billing">
+      <header class="page-head" style="margin-bottom:16px">
+        <div><div class="eyebrow">Membership</div><h1 class="h1">Plan &amp; billing</h1></div>
+        <button class="head-chip" data-nav="profile">← Profile</button>
+      </header>
+
+      <div class="card plan-current">
+        <div class="row-between" style="align-items:flex-start">
+          <div>
+            <div class="tiny">CURRENT PLAN</div>
+            <div class="plan-name" id="curPlanName">Starter</div>
+            <div class="sub" id="curPlanSub">Free forever. Upgrade when you want adaptive coaching.</div>
+          </div>
+          <span class="plan-badge" id="curPlanBadge">FREE</span>
+        </div>
+        <div class="divider"></div>
+        <div class="row-between"><span class="tiny">Next renewal</span><span class="pill-tag" id="curRenew">—</span></div>
+        <div class="row-between" style="margin-top:8px"><span class="tiny">Payment method</span><span class="pill-tag" id="curCard">None</span></div>
+        <div class="plan-actions" id="planActions"></div>
+      </div>
+
+      <div class="sec-head">
+        <h2 class="h2">Choose your plan</h2>
+        <div class="cycle-toggle" id="cycleToggle">
+          <button type="button" data-cycle="monthly" class="active">Monthly</button>
+          <button type="button" data-cycle="annual">Annual <em>−20%</em></button>
+        </div>
+      </div>
+      <div class="plan-grid" id="planGrid"></div>
+      <p class="plan-note">Prices in USD. Cancel anytime. Payments run in test mode — no real charge is made.</p>
+
+      <div id="checkoutWrap"></div>
+
+      <div class="sec-head"><h2 class="h2">Billing history</h2><span class="meta" id="invoiceCount">0 invoices</span></div>
+      <div class="card list-card" id="invoiceList"></div>
+
+      <p class="bill-status" id="billStatus" role="status" aria-live="polite"></p>
     </section>
 
   </div>
