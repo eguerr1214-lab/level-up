@@ -201,7 +201,8 @@ function defaultState(){
     dayCelebrated: false,
     fcIndex: 0,
     assignments: defaultAssignments(),
-    weekMinutes: [38, 52, 0, 64, 45, 72, 30]
+    weekMinutes: [38, 52, 0, 64, 45, 72, 30],
+    settings: { reminders: true, haptics: true, accent: 'midnight' }
   };
 }
 

@@ -645,3 +645,15 @@ h1,h2,h3,b,strong{font-family:var(--display)}
 button.setting{width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit;padding:0;cursor:pointer}
 .setting[data-nav]{cursor:pointer}
 .setting[data-nav]:active{background:rgba(255,255,255,.03)}
+
+/* ============ SETTINGS CONTROLS ============ */
+button.toggle{border:0;padding:0;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button.pill-tag{border:0;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button.pill-tag:hover{color:var(--txt);border-color:var(--line2)}
+.setting[role="button"]{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.setting[role="button"]:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.toggle:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* ============ ACCENT THEMES ============ */
+#phone[data-accent="violet"]{--blue:#9B5CFF;--blue2:#7C3AED;--purple:#38E0CE;--violet:#9B5CFF;--grad:linear-gradient(135deg,#7C3AED 0%,#38E0CE 100%)}
+#phone[data-accent="sunset"]{--blue:#FF9F45;--blue2:#FF5C8A;--purple:#FF5C8A;--violet:#FF9F45;--grad:linear-gradient(135deg,#FF9F45 0%,#FF5C8A 100%)}
