@@ -985,25 +985,39 @@ function renderHome(){
   ).join('');
 
   /* habits */
-  const habitEmoji = { 'Morning routine':'🌅','Night routine':'🌙','Hydration':'💧','Stretch':'🧘','Journal':'📓','Read':'📖','Less screen':'📵','Eat well':'🥗' };
   const habitList = state.habits;
-  const habitDone = habitList.filter(h => state.habitsDone[h]).length;
+  const habitDone = habitList.filter(h => habitDoneToday(h.id)).length;
   $('#habitCount').textContent = `${habitDone}/${habitList.length}`;
-  $('#habitList').innerHTML = habitList.map(h => {
-    const on = !!state.habitsDone[h];
-    const icon = (state.habitIcons && state.habitIcons[h]) || habitEmoji[h] || '✨';
-    const reminder = state.habitReminders && state.habitReminders[h];
+  const { mondayIndex: todayIdx } = nowParts();
+  $('#habitList').innerHTML = habitList.length ? habitList.map(h => {
+    const on = habitDoneToday(h.id);
+    const streak = habitStreak(h.id);
+    const week = habitWeek(h.id);
     return `<div class="habit-row">
-      <div class="habit-ico">${icon}</div>
-      <div class="t-body"><div class="t-label" style="${on ? 'color:var(--muted2);text-decoration:line-through' : ''}">${esc(h)}</div><div class="t-sub">${on ? 'Completed today' : (reminder ? '⏰ ' + esc(reminder) : 'Tap to check off')}</div></div>
-      <button class="check habit-toggle ${on ? 'done' : ''}" style="${on ? 'background:var(--grad);border-color:transparent;color:#fff' : ''}" data-habit="${esc(h)}" aria-label="Toggle ${esc(h)}">${svgCheck()}</button>
+      <div class="habit-ico">${esc(h.icon || '✨')}</div>
+      <div class="t-body">
+        <div class="t-label" style="${on ? 'color:var(--muted2);text-decoration:line-through' : ''}">${esc(h.name)}</div>
+        <div class="t-sub">${on ? 'Completed today' : (h.reminder ? '⏰ ' + esc(h.reminder) : 'Tap to check off')}${streak > 1 ? ` · 🔥 ${streak}-day streak` : ''}</div>
+        <div class="habit-week">${week.map((v, i) => `<i class="${v ? 'on' : ''}${i === todayIdx ? ' today' : ''}" title="${DAYS_SHORT[i]}"></i>`).join('')}</div>
+      </div>
+      <button class="icon-btn sm" data-habit-edit="${h.id}" aria-label="Edit ${esc(h.name)}">✎</button>
+      <button class="check habit-toggle ${on ? 'done' : ''}" style="${on ? 'background:var(--grad);border-color:transparent;color:#fff' : ''}" data-habit="${h.id}" aria-label="Toggle ${esc(h.name)}">${svgCheck()}</button>
     </div>`;
-  }).join('');
-  const heat = [1,1,1,0,1,1,1,1,1,0,1,1,1,1];
-  if (habitDone > 0) heat[13] = 1;
-  $('#habitHeat').innerHTML = heat.map(v => `<i class="${v ? 'on' : ''}"></i>`).join('');
-  const monthPct = Math.min(98, 78 + habitDone * 3);
-  $('#habitConsistency').textContent = `${monthPct}% this month`;
+  }).join('') : `<div class="empty-note">No habits yet. Tap “Add habit” to create your first one.</div>`;
+
+  /* heat map + consistency from the real habit log */
+  const heat = [];
+  for (let i = 13; i >= 0; i--) {
+    const key = shiftKey(todayKey(), -i);
+    const day = state.habitLog[key] || {};
+    const count = Object.keys(day).filter(k => day[k]).length;
+    heat.push(count === 0 ? 0 : count >= Math.max(1, Math.ceil(habitList.length / 2)) ? 2 : 1);
+  }
+  $('#habitHeat').innerHTML = heat.map(v => `<i class="${v === 2 ? 'on' : v === 1 ? 'half' : ''}"></i>`).join('');
+  const weekCells = habitList.reduce((sum, h) => sum + habitWeek(h.id).filter(Boolean).length, 0);
+  const weekPossible = habitList.length * (todayIdx + 1);
+  const weekPct = weekPossible ? Math.round(weekCells / weekPossible * 100) : 0;
+  $('#habitConsistency').textContent = `${weekPct}% this week`;
 
   /* ai recommendation */
   renderAiRecommendation();
