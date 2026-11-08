@@ -479,6 +479,16 @@ app.post('/api/billing/checkout', rateLimit, (req, res) => {
   res.json({ user: publicUser(user), invoice: { ...invoice, amountLabel: money(invoice.amount) } });
 });
 
+app.post('/api/billing/payment-method', rateLimit, (req, res) => {
+  const user = currentUser(req);
+  if (!user) return res.status(401).json({ error: 'Sign in to update your payment method.' });
+  const validated = validateCard(req.body?.card);
+  if (validated.error) return res.status(400).json({ error: validated.error });
+  user.card = validated.card;
+  saveDb();
+  res.json({ user: publicUser(user) });
+});
+
 app.post('/api/billing/cancel', (req, res) => {
   const user = currentUser(req);
   if (!user) return res.status(401).json({ error: 'Sign in to manage your plan.' });
