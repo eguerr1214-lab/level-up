@@ -1151,27 +1151,25 @@ function renderSports(){
   }).join('');
 
   const { mondayIndex } = nowParts();
-  const sched = [
-    { t: sp.drills[0].t + ' focus', s: '35 min · after school' },
-    { t: 'Strength + mobility', s: '30 min · gym or home' },
-    { t: sp.drills[1].n, s: '25 min · skill block' },
-    { t: 'Recovery + film study', s: '20 min · low intensity' },
-    { t: 'Team practice', s: '90 min · full intensity' },
-    { t: 'Game day', s: 'Warm-up + compete' },
-    { t: 'Reset & mobility', s: '15 min · easy' }
-  ];
+  const sched = scheduleFor();
   $('#sportSchedule').innerHTML = sched.map((s, i) => {
     const isToday = i === mondayIndex;
     return `<div class="schedule-row ${isToday ? 'today' : ''}">
-      <div class="sch-day"><b>${DAYS_SHORT[i]}</b><span>${i === mondayIndex ? 'TODAY' : ''}</span></div>
-      <div class="sch-bar"><div><b>${esc(s.t)}</b><span>${esc(s.s)}</span></div><span class="mini-tag">${isToday ? 'NOW' : i < mondayIndex ? 'DONE' : 'PLAN'}</span></div>
+      <div class="sch-day"><b>${DAYS_SHORT[i]}</b><span>${isToday ? 'TODAY' : ''}</span></div>
+      <div class="sch-bar"><div><b>${esc(s.title)}</b><span>${esc(s.detail)}</span></div>
+        <button class="icon-btn sm" data-practice-edit="${i}" aria-label="Edit ${esc(s.title)}">✎</button></div>
     </div>`;
   }).join('');
 
-  $('#goalList').innerHTML = sp.goals.map(g => `
+  $('#goalList').innerHTML = goalsFor().map(g => `
     <div class="goal">
-      <div class="goal-top"><b>${esc(g.n)}</b><span>${esc(g.label)}</span></div>
-      <div class="track"><i style="width:${g.v}%"></i></div>
+      <div class="goal-top"><b>${esc(g.name)}</b><span>${g.value}%${g.target && g.target !== 100 ? ` / ${g.target}%` : ''}</span></div>
+      <div class="track"><i style="width:${g.value}%"></i></div>
+      <div class="goal-actions">
+        <button class="icon-btn sm" data-goal-delta="-5" data-goal-id="${g.id}" aria-label="Lower ${esc(g.name)}">−</button>
+        <button class="icon-btn sm" data-goal-delta="5" data-goal-id="${g.id}" aria-label="Raise ${esc(g.name)}">+</button>
+        <span class="tiny">Log progress</span>
+      </div>
     </div>`).join('');
 
   $('#radarChart').innerHTML = radarSVG(sp.radar);
