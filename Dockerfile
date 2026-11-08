@@ -1,15 +1,14 @@
 # LEVEL UP — production image
-FROM node:24-bookworm-slim AS base
+# Pure-JS Express app: Alpine keeps the runtime small and on patched musl packages.
+FROM node:24-alpine AS runtime
 
 ENV NODE_ENV=production \
     PORT=3000
 
 WORKDIR /app
 
-# Apply the distributor's fixed OS packages in the same layer.
-RUN apt-get update \
- && apt-get upgrade -y --no-install-recommends \
- && rm -rf /var/lib/apt/lists/*
+# Apply the latest Alpine security fixes in the same layer as the base image.
+RUN apk upgrade --no-cache
 
 # Dependencies first for layer caching.
 COPY package.json package-lock.json ./
@@ -19,14 +18,13 @@ RUN npm ci --omit=dev --no-audit --no-fund \
 COPY server.js ./
 COPY public ./public
 
-# Writable data dir for the JSON account store, owned by the runtime user.
-RUN mkdir -p /app/data && chown -R node:node /app/data
+RUN mkdir -p /app/data && chown -R node:node /app
 
 USER node
 
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget -qO- "http://127.0.0.1:${PORT}/api/health" >/dev/null || exit 1
 
 CMD ["node", "server.js"]
