@@ -1391,17 +1391,6 @@ function setWater(i){
   renderProfile();
 }
 
-function toggleAssignment(id){
-  const a = state.assignments.find(x => x.id === id);
-  if (!a) return;
-  a.done = !a.done;
-  if (state.tasksDone.study && a.done) { /* keep study task as-is */ }
-  toast(a.done ? 'Assignment complete ✓' : 'Moved back to your list', a.done ? '✅' : '↩');
-  haptic();
-  saveState();
-  renderSchool();
-  renderHome();
-}
 function answerQuiz(i){
   if (state.quizAnswer !== null) return;
   const q = QUIZ[state.quizIndex];
