@@ -1953,6 +1953,291 @@ $('#regenPlan').addEventListener('click', () => {
   confetti();
 });
 
+/* ============================================================
+   EDITOR SHEETS
+   ============================================================ */
+function sheetField(label, inner){ return `<label class="mini-label">${label}</label>${inner}`; }
+
+/* --- assignments --- */
+let editingAssignId = null;
+function openAssignmentSheet(id){
+  const a = id ? state.assignments.find(x => x.id === id) : null;
+  editingAssignId = a ? a.id : null;
+  const subs = [...new Set([...subjects(), 'Math', 'Biology', 'History', 'English', 'Spanish', 'Science'])];
+  $('#miniTitle').textContent = a ? 'Edit assignment' : 'Add assignment';
+  $('#miniContent').innerHTML = `
+    ${sheetField('What is it?', `<input class="mini-input" id="asgTitle" maxlength="70" value="${a ? esc(a.title) : ''}" placeholder="e.g. Biology lab report" autocomplete="off">`)}
+    ${sheetField('Subject', `<input class="mini-input" id="asgSubject" maxlength="24" list="subjectOptions" value="${a ? esc(a.subject) : ''}" placeholder="e.g. Biology" autocomplete="off">
+      <datalist id="subjectOptions">${subs.map(s => `<option value="${esc(s)}">`).join('')}</datalist>`)}
+    ${sheetField('Due date', `<input class="mini-input" id="asgDue" type="date" value="${a ? esc(a.due) : todayKey()}">`)}
+    <button class="btn primary mini-save" id="asgSave">${a ? 'Save changes' : 'Add assignment'}</button>
+    ${a ? '<button class="btn ghost full sm mt8" id="asgDelete">Delete assignment</button>' : ''}`;
+  $('#asgSave').addEventListener('click', saveAssignmentSheet);
+  const del = $('#asgDelete');
+  if (del) del.addEventListener('click', () => { deleteAssignment(editingAssignId); closeMini(); });
+  openMini();
+  setTimeout(() => $('#asgTitle').focus(), 350);
+}
+function saveAssignmentSheet(){
+  const title = $('#asgTitle').value.trim();
+  const subject = $('#asgSubject').value.trim() || 'General';
+  const due = $('#asgDue').value || todayKey();
+  if (!title) { toast('Add a title so you know what to do', '✏️'); return; }
+  saveAssignment({ id: editingAssignId, title, subject, due });
+  closeMini(); haptic();
+}
+
+/* --- grades --- */
+let editingGradeId = null;
+function openGradeSheet(id){
+  const g = id ? state.grades.find(x => x.id === id) : null;
+  editingGradeId = g ? g.id : null;
+  $('#miniTitle').textContent = g ? 'Edit grade' : 'Add subject';
+  $('#miniContent').innerHTML = `
+    ${sheetField('Subject', `<input class="mini-input" id="grName" maxlength="24" value="${g ? esc(g.name) : ''}" placeholder="e.g. Chemistry" autocomplete="off">`)}
+    ${sheetField('Current grade (%)', `<input class="mini-input" id="grValue" type="number" min="0" max="100" value="${g ? g.value : 85}">`)}
+    <button class="btn primary mini-save" id="grSave">${g ? 'Save grade' : 'Add subject'}</button>
+    ${g ? '<button class="btn ghost full sm mt8" id="grDelete">Remove subject</button>' : ''}`;
+  $('#grSave').addEventListener('click', saveGradeSheet);
+  const del = $('#grDelete');
+  if (del) del.addEventListener('click', () => { deleteGrade(editingGradeId); closeMini(); });
+  openMini();
+  setTimeout(() => $('#grName').focus(), 350);
+}
+function saveGradeSheet(){
+  const name = $('#grName').value.trim();
+  const value = Math.max(0, Math.min(100, Number($('#grValue').value) || 0));
+  if (!name) { toast('Name the subject first', '✏️'); return; }
+  saveGrade({ id: editingGradeId, name, value });
+  closeMini(); haptic();
+}
+
+/* --- practice / workout schedule rows --- */
+let editingDay = null, editingSportDay = false;
+function openPracticeSheet(index, isSport){
+  editingDay = index; editingSportDay = !!isSport;
+  const row = isSport ? scheduleFor()[index] : state.workoutSchedule[index];
+  $('#miniTitle').textContent = `${DAYS[index]} ${isSport ? 'practice' : 'workout'}`;
+  $('#miniContent').innerHTML = `
+    ${sheetField('Session', `<input class="mini-input" id="pracTitle" maxlength="40" value="${esc(row.title)}" autocomplete="off">`)}
+    ${sheetField('Details', `<input class="mini-input" id="pracDetail" maxlength="48" value="${esc(row.detail || '')}" placeholder="e.g. 35 min · after school" autocomplete="off">`)}
+    ${sheetField('Minutes', `<input class="mini-input" id="pracMins" type="number" min="0" max="180" value="${Number(row.minutes) || 0}">`)}
+    <button class="btn primary mini-save" id="pracSave">Save session</button>`;
+  $('#pracSave').addEventListener('click', () => {
+    const title = $('#pracTitle').value.trim() || 'Rest';
+    const detail = $('#pracDetail').value.trim();
+    const minutes = Math.max(0, Math.min(180, Number($('#pracMins').value) || 0));
+    if (isSport) {
+      const sched = scheduleFor();
+      sched[index] = Object.assign({}, sched[index], { title, detail, minutes });
+      toast('Practice updated', '✓'); saveState(); renderSports();
+    } else {
+      state.workoutSchedule[index] = Object.assign({}, state.workoutSchedule[index], { title, detail, minutes });
+      toast('Workout schedule updated', '✓'); saveState(); renderFitness(); renderHome();
+    }
+    closeMini(); haptic();
+  });
+  openMini();
+  setTimeout(() => $('#pracTitle').focus(), 350);
+}
+
+/* --- skill goals --- */
+function openGoalSheet(){
+  $('#miniTitle').textContent = `Add ${sportName()} skill goal`;
+  $('#miniContent').innerHTML = `
+    ${sheetField('Skill', `<input class="mini-input" id="goalName" maxlength="34" placeholder="e.g. Left-hand finishing" autocomplete="off">`)}
+    ${sheetField('Starting progress (%)', `<input class="mini-input" id="goalStart" type="number" min="0" max="100" value="0">`)}
+    <button class="btn primary mini-save" id="goalSave">Add goal</button>`;
+  $('#goalSave').addEventListener('click', () => {
+    const name = $('#goalName').value.trim();
+    if (!name) { toast('Name the skill you are chasing', '🎯'); return; }
+    const value = Math.max(0, Math.min(100, Number($('#goalStart').value) || 0));
+    goalsFor().push({ id: uid('sg'), name, value, target: 100, unit: '%' });
+    saveState(); renderSports(); renderProfile(); closeMini(); haptic();
+    toast('Skill goal added', '🎯');
+  });
+  openMini();
+  setTimeout(() => $('#goalName').focus(), 350);
+}
+
+/* --- profile --- */
+function openProfileSheet(){
+  $('#miniTitle').textContent = 'Edit profile';
+  const sel = (id, value, opts) => `<select class="mini-input" id="${id}">${opts.map(o => `<option value="${esc(o)}" ${o === value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+  $('#miniContent').innerHTML = `
+    ${sheetField('Name', `<input class="mini-input" id="pfName" maxlength="24" value="${esc(state.name || '')}" autocomplete="off">`)}
+    ${sheetField('Main goal', sel('pfGoal', state.goal, ['Get stronger','Build muscle','Lose fat','Boost endurance','Improve focus','Build discipline']))}
+    ${sheetField('Daily time', sel('pfTime', state.time, ['20 minutes','40 minutes','60 minutes','90 minutes']))}
+    ${sheetField('Experience', sel('pfExp', state.experience, ['Beginner','Intermediate','Advanced']))}
+    ${sheetField('Primary sport', sel('pfSport', sportName(), Object.keys(SPORTS)))}
+    <button class="btn primary mini-save" id="pfSave">Save profile</button>
+    <button class="btn ghost full sm mt8" id="pfRedo">Redo personalization</button>`;
+  $('#pfSave').addEventListener('click', () => {
+    const name = $('#pfName').value.trim();
+    if (!name) { toast('Your name cannot be empty', '✏️'); return; }
+    state.name = name;
+    state.goal = $('#pfGoal').value;
+    state.time = $('#pfTime').value;
+    state.experience = $('#pfExp').value;
+    const sport = $('#pfSport').value;
+    if (SPORTS[sport]) { state.sport = sport; if (!state.sports.includes(sport)) state.sports = [sport, ...state.sports].slice(0, 3); }
+    saveState(); closeMini(); renderAll();
+    toast('Profile updated', '✓'); haptic();
+  });
+  $('#pfRedo').addEventListener('click', () => { closeMini(); showOnb(0); });
+  openMini();
+  setTimeout(() => $('#pfName').focus(), 350);
+}
+
+/* --- exercise library --- */
+function openExerciseLibrary(){
+  $('#miniTitle').textContent = 'Exercise library';
+  $('#miniContent').innerHTML = Object.keys(WORKOUTS).map(level => {
+    const plan = WORKOUTS[level];
+    return `<div class="lib-group">
+      <div class="lib-head"><b>${plan.name}</b><span class="tiny">${level} · ${plan.dur} min</span></div>
+      ${plan.exercises.map(x => `<div class="lib-row">
+        <span class="lib-ico">${x.emoji || '💪'}</span>
+        <div class="t-body"><div class="t-label">${esc(x.name)}</div><div class="t-sub">${esc(x.desc)} · ${x.sets} × ${esc(x.reps)}</div></div>
+        ${level === state.difficulty ? '<span class="mini-tag">YOUR PLAN</span>' : ''}
+      </div>`).join('')}
+    </div>`;
+  }).join('') + `<div class="empty-note" style="margin-top:10px">Pick a plan level from the Fitness screen to start one of these.</div>`;
+  openMini();
+}
+
+/* --- manual workout log --- */
+function openWorkoutLog(){
+  $('#miniTitle').textContent = 'Log a workout';
+  $('#miniContent').innerHTML = `
+    ${sheetField('What did you do?', `<input class="mini-input" id="logTitle" maxlength="40" value="${esc(currentWorkout().name)}" autocomplete="off">`)}
+    ${sheetField('Minutes', `<input class="mini-input" id="logMins" type="number" min="1" max="240" value="${currentWorkout().dur}">`)}
+    <button class="btn primary mini-save" id="logSave">Log workout</button>`;
+  $('#logSave').addEventListener('click', () => {
+    const title = $('#logTitle').value.trim() || 'Workout';
+    const minutes = Math.max(1, Math.min(240, Number($('#logMins').value) || 30));
+    recordWorkout({ title, minutes, source: 'manual' });
+    if (!state.tasksDone.workout) setTaskDone('workout', true, { silent: true });
+    saveState(); closeMini(); renderAll();
+    toast(`Logged · ${minutes} min`, '💪'); confetti(); haptic();
+  });
+  openMini();
+}
+
+/* ============================================================
+   NEW CONTROL HANDLERS
+   ============================================================ */
+document.addEventListener('click', (e) => {
+  const t = e.target;
+  const hit = (sel) => t.closest(sel);
+
+  const habitEdit = hit('[data-habit-edit]');
+  if (habitEdit) { openHabitSheet(habitEdit.dataset.habitEdit); return; }
+  if (hit('[data-habit-add]')) { openHabitSheet(); return; }
+
+  const asgEdit = hit('[data-assignment-edit]');
+  if (asgEdit) { openAssignmentSheet(asgEdit.dataset.assignmentEdit); return; }
+  if (hit('[data-assignment-add]')) { openAssignmentSheet(); return; }
+
+  const gradeEdit = hit('[data-grade-edit]');
+  if (gradeEdit) { openGradeSheet(gradeEdit.dataset.gradeEdit); return; }
+  if (hit('[data-grade-add]')) { openGradeSheet(); return; }
+
+  const schEdit = hit('[data-schedule-edit]');
+  if (schEdit) { openPracticeSheet(Number(schEdit.dataset.scheduleEdit), false); return; }
+
+  const pracEdit = hit('[data-practice-edit]');
+  if (pracEdit) { openPracticeSheet(Number(pracEdit.dataset.practiceEdit), true); return; }
+
+  const logWorkout = hit('[data-log-workout]');
+  if (logWorkout) {
+    const idx = Number(logWorkout.dataset.logWorkout);
+    const row = state.workoutSchedule[idx] || {};
+    const minutes = Number(row.minutes) || currentWorkout().dur;
+    recordWorkout({ title: row.title || currentWorkout().name, minutes, source: 'schedule' });
+    if (!state.tasksDone.workout) setTaskDone('workout', true, { silent: true });
+    saveState(); renderAll();
+    toast(`Logged · ${minutes} min`, '💪'); confetti(); haptic();
+    return;
+  }
+  if (hit('[data-log-workout-manual]')) { openWorkoutLog(); return; }
+
+  const goalBtn = hit('[data-goal-delta]');
+  if (goalBtn) { logGoalProgress(goalBtn.dataset.goalId, Number(goalBtn.dataset.goalDelta)); return; }
+  if (hit('[data-goal-add]')) { openGoalSheet(); return; }
+
+  const subFilter = hit('[data-subject-filter]');
+  if (subFilter) { state.schoolFilter = subFilter.dataset.subjectFilter; saveState(); renderSchool(); return; }
+
+  const focusBtn = hit('[data-focus]');
+  if (focusBtn) {
+    showScreen('school');
+    const el = $('#focusTime');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    toast('Focus timer ready — press Start', '⏱');
+    return;
+  }
+  if (hit('[data-exercise-library]')) { openExerciseLibrary(); return; }
+  if (hit('[data-profile-edit]')) { openProfileSheet(); return; }
+  if (hit('[data-card-edit]')) { openCardEditSheet(); return; }
+});
+
+/* Edit / delete a user-created flashcard. */
+function openCardEditSheet(){
+  const idx = state.fcIndex - FLASHCARDS.length;
+  const card = state.customCards[idx];
+  if (!card) return;
+  $('#miniTitle').textContent = 'Edit flashcard';
+  $('#miniContent').innerHTML = `
+    ${sheetField('Question', `<textarea class="mini-textarea" id="miniQuestion" maxlength="160">${esc(card.q)}</textarea>`)}
+    ${sheetField('Answer', `<textarea class="mini-textarea" id="miniAnswer" maxlength="240">${esc(card.a)}</textarea>`)}
+    <button class="btn primary mini-save" id="cardSave">Save card</button>
+    <button class="btn ghost full sm mt8" id="cardDelete">Delete card</button>`;
+  $('#cardSave').addEventListener('click', () => {
+    const q = $('#miniQuestion').value.trim(), a = $('#miniAnswer').value.trim();
+    if (!q || !a) { toast('Both sides are needed', '🗂'); return; }
+    card.q = q; card.a = a;
+    saveState(); closeMini(); renderSchool();
+    toast('Flashcard updated', '🗂'); haptic();
+  });
+  $('#cardDelete').addEventListener('click', () => {
+    state.customCards.splice(idx, 1);
+    state.fcIndex = 0;
+    saveState(); closeMini(); renderSchool();
+    toast('Flashcard deleted', '🗑');
+  });
+  openMini();
+}
+
+function savePractice(dayIndex, data){
+  const sched = scheduleFor();
+  sched[dayIndex] = Object.assign({}, sched[dayIndex], data);
+  saveState(); renderSports();
+}
+function saveGrade(data){
+  if (data.id) {
+    const g = state.grades.find(x => x.id === data.id);
+    if (g) Object.assign(g, { name: data.name, value: data.value });
+    toast('Grade updated', '✓');
+  } else {
+    state.grades.push({ id: uid('g'), name: data.name, value: data.value });
+    toast('Subject added', '✓');
+  }
+  saveState(); renderSchool(); renderProfile();
+}
+function deleteGrade(id){
+  state.grades = state.grades.filter(g => g.id !== id);
+  saveState(); renderSchool();
+  toast('Subject removed', '🗑');
+}
+function deleteGoal(id){
+  const goals = goalsFor();
+  const i = goals.findIndex(g => g.id === id);
+  if (i >= 0) goals.splice(i, 1);
+  saveState(); renderSports();
+  toast('Goal removed', '🗑');
+}
+
 window.showScreen = showScreen;
 
 /* boot */
