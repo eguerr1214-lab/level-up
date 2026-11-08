@@ -508,7 +508,7 @@ function getCards(){ return [...FLASHCARDS, ...(state.customCards || [])]; }
 function makeTasks(){
   const w = currentWorkout();
   const sport = currentSport();
-  const habitName = state.habits[0] || 'Morning routine';
+  const habitName = (state.habits[0] && state.habits[0].name) || 'Morning routine';
   const firstAssign = state.assignments.find(a => !a.done) || state.assignments[0];
   return [
     { id:'morning', label:`${habitName} — 5 min reset`, sub:'Habits · Mindset', xp:15, icon:'🌅' },
@@ -1407,12 +1407,9 @@ function answerQuiz(i){
   const q = QUIZ[state.quizIndex];
   state.quizAnswer = i;
   if (i === q.answer) {
-    if (!state.quizAwarded[state.quizIndex]) {
-      state.quizAwarded[state.quizIndex] = true;
-      addXp(10);
-    }
-    toast('Correct! +10 XP', '🎯');
-    confetti();
+    const fresh = awardXp(`quiz:${state.quizIndex}`, 10, 'Quiz answered correctly', '🎯');
+    if (fresh) confetti();
+    else toast('Correct — you already earned XP for this question', '🎯');
   } else {
     toast('Not quite — check the explanation', '💡');
   }
