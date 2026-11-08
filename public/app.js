@@ -309,7 +309,155 @@ function toggleDrill(i){
   else { state.drillsDone[key] = true; addXp(10); toast('+10 XP · Drill complete', '🏆'); haptic(); }
   saveState(); renderSports(); renderHome(); renderProfile();
 }
-function haptic(){ if (navigator.vibrate) try { navigator.vibrate(8); } catch(e){} }
+function haptic(){ if (!settings().haptics) return; if (navigator.vibrate) try { navigator.vibrate(8); } catch(e){} }
+
+/* ---------- settings, appearance, privacy, account ---------- */
+const ACCENTS = [
+  { id:'midnight', label:'Midnight', note:'Blue → violet' },
+  { id:'violet',   label:'Aurora',   note:'Violet → teal' },
+  { id:'sunset',   label:'Sunset',   note:'Amber → pink' }
+];
+function settings(){
+  if (!state.settings || typeof state.settings !== 'object') state.settings = {};
+  const s = state.settings;
+  if (typeof s.reminders !== 'boolean') s.reminders = true;
+  if (typeof s.haptics !== 'boolean') s.haptics = true;
+  if (!ACCENTS.some(a => a.id === s.accent)) s.accent = 'midnight';
+  return s;
+}
+function applyAccent(){
+  const phone = $('#phone');
+  if (phone) phone.dataset.accent = settings().accent;
+}
+function syncSettingsUI(){
+  const s = settings();
+  $('[data-setting]').forEach(el => {
+    const on = !!s[el.dataset.setting];
+    el.classList.toggle('on', on);
+    el.setAttribute('aria-checked', on ? 'true' : 'false');
+    const sub = el.closest('.setting') && el.closest('.setting').querySelector('.s-body span');
+    if (sub) {
+      if (el.dataset.setting === 'reminders') sub.textContent = on ? 'Adapts to your schedule' : 'Paused — no nudges';
+      if (el.dataset.setting === 'haptics') sub.textContent = on ? 'Tactile on completions' : 'Vibrations off';
+    }
+  });
+  const themeBtn = $('#themeBtn');
+  if (themeBtn) {
+    const a = ACCENTS.find(x => x.id === s.accent) || ACCENTS[0];
+    themeBtn.textContent = a.label;
+  }
+}
+function toggleSetting(key){
+  const s = settings();
+  s[key] = !s[key];
+  saveState();
+  syncSettingsUI();
+  haptic();
+  if (key === 'haptics') toast(s.haptics ? 'Haptic feedback on' : 'Haptic feedback off', s.haptics ? '📳' : '🔇');
+  else toast(s.reminders ? 'Smart reminders on' : 'Smart reminders paused', s.reminders ? '🔔' : '🔕');
+}
+function openAppearanceSheet(){
+  const s = settings();
+  $('#miniTitle').textContent = 'Appearance';
+  $('#miniContent').innerHTML = `
+    <p class="mini-label">Accent color</p>
+    <div class="opt-grid">
+      ${ACCENTS.map(a => `
+        <button type="button" class="opt ${a.id === s.accent ? 'selected' : ''}" data-accent-opt="${a.id}" aria-pressed="${a.id === s.accent}">
+          <span class="o-txt"><b>${a.label}</b><span>${a.note}</span></span>
+          <span class="o-check">✓</span>
+        </button>`).join('')}
+    </div>
+    <p class="tiny" style="margin-top:14px;line-height:1.6">The accent changes buttons, highlights and the gradient behind your stats across the whole app.</p>`;
+  $('#miniContent [data-accent-opt]').forEach(btn => btn.addEventListener('click', () => {
+    settings().accent = btn.dataset.accentOpt;
+    saveState();
+    applyAccent();
+    syncSettingsUI();
+    $('#miniContent [data-accent-opt]').forEach(x => {
+      const sel = x === btn;
+      x.classList.toggle('selected', sel);
+      x.setAttribute('aria-pressed', sel ? 'true' : 'false');
+    });
+    toast(`Accent: ${btn.querySelector('b').textContent}`, '🎨');
+    haptic();
+  }));
+  openMini();
+}
+function openPrivacySheet(){
+  const u = window.LEVELUP_USER;
+  $('#miniTitle').textContent = 'Privacy';
+  $('#miniContent').innerHTML = `
+    <p class="mini-label">What is stored</p>
+    <p class="tiny" style="line-height:1.6">${u
+      ? `Your account <b>${esc(u.email)}</b> keeps your name, a hashed password and your plan. Your daily progress stays in this browser.`
+      : 'You are in demo mode. Your progress is saved only in this browser — no account, nothing sent to a server.'}</p>
+    <p class="mini-label" style="margin-top:14px">Security</p>
+    <p class="tiny" style="line-height:1.6">Passwords are hashed with scrypt and never stored in plain text. Sessions use signed, HTTP-only cookies. Card details are never stored — only the brand and last four digits.</p>
+    <button type="button" class="btn ghost full sm mt10" id="miniClearData">Clear my progress on this device</button>`;
+  $('#miniClearData').addEventListener('click', () => {
+    if (!confirm('Clear all saved progress on this device? This cannot be undone.')) return;
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
+    state = loadState();
+    applyAccent();
+    renderAll();
+    closeMini();
+    toast('Local progress cleared', '🧹');
+  });
+  openMini();
+}
+function openAccountSheet(){
+  const u = window.LEVELUP_USER;
+  $('#miniTitle').textContent = 'Your account';
+  $('#miniContent').innerHTML = `
+    <label class="mini-label" for="miniAccName">Display name</label>
+    <input class="mini-input" id="miniAccName" maxlength="40" value="${esc(state.name || '')}" autocomplete="off">
+    <p class="tiny" style="margin-top:8px">${u ? esc(u.email) : 'Demo mode · no account yet'}</p>
+    <button type="button" class="btn primary full sm mt10" id="miniAccSave">Save name</button>
+    <button type="button" class="btn ghost full sm mt10" id="miniAccBilling">Plan &amp; billing</button>
+    <button type="button" class="btn ghost full sm mt10" id="miniAccAuth">${u ? 'Sign out' : 'Create an account or sign in'}</button>`;
+  $('#miniAccSave').addEventListener('click', () => {
+    const v = $('#miniAccName').value.trim();
+    if (!v) { toast('Enter a name first', '⚠️'); return; }
+    state.name = v;
+    saveState();
+    renderAll();
+    closeMini();
+    toast('Name updated', '✓');
+    haptic();
+  });
+  $('#miniAccBilling').addEventListener('click', () => {
+    closeMini();
+    const row = $('#billingRow');
+    if (row) row.click();
+    else showScreen('billing');
+  });
+  $('#miniAccAuth').addEventListener('click', () => {
+    closeMini();
+    const btn = $('#signOutBtn');
+    if (btn) btn.click();
+    else location.reload();
+  });
+  openMini();
+}
+
+/* Delegated wiring so the settings controls work on any screen render */
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#signOutBtn')) return;
+  const t = e.target.closest('[data-setting]');
+  if (t) { e.preventDefault(); toggleSetting(t.dataset.setting); return; }
+  if (e.target.closest('#themeBtn')) { openAppearanceSheet(); return; }
+  if (e.target.closest('#privacyBtn')) { openPrivacySheet(); return; }
+  if (e.target.closest('#accountRow')) openAccountSheet();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const row = e.target.closest && e.target.closest('#accountRow, [data-setting]');
+  if (!row) return;
+  e.preventDefault();
+  row.click();
+});
+try { applyAccent(); } catch(e){}
 
 /* ---------- toast + confetti ---------- */
 let toastTimer = null;
