@@ -164,13 +164,118 @@ const WEEK_PLAN = {
 };
 
 /* ---------- state ---------- */
-function defaultAssignments(){
+function todayKey(d = new Date()){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dateFromKey(key){
+  const [y,m,d] = String(key || '').split('-').map(Number);
+  return new Date(y || 2024, (m || 1) - 1, d || 1);
+}
+function shiftKey(key, days){
+  const d = dateFromKey(key);
+  d.setDate(d.getDate() + days);
+  return todayKey(d);
+}
+function uid(prefix){ return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2,6)}`; }
+
+const HABIT_XP = 5, DRILL_XP = 10, ASSIGN_XP = 15, GOAL_XP = 10, FOCUS_XP = 20;
+const TASK_XP = { morning:15, workout:40, study:30, drills:25, water:15 };
+function taskKeyFor(id){
+  const day = todayKey();
+  if (id === 'workout') return `workout:${day}`;
+  if (id === 'water') return `water:${day}`;
+  return `task:${id}:${day}`;
+}
+
+function defaultHabits(){
   return [
-    { id:'alg', title:'Algebra: Quadratics worksheet', subject:'Math', color:'#4C8DFF', due:'Tomorrow', dueClass:'soon', done:false },
-    { id:'bio', title:'Biology lab report — cellular energy', subject:'Biology', color:'#3DDC97', due:'Friday', dueClass:'', done:false },
-    { id:'hist', title:'History reading + notes (pp. 142–160)', subject:'History', color:'#FF9F45', due:'Monday', dueClass:'ok', done:false },
-    { id:'span', title:'Spanish vocab set 7', subject:'Spanish', color:'#FF5C8A', due:'Thursday', dueClass:'', done:false }
+    { id:'h_morning', name:'Morning routine', icon:'🌅', reminder:'7:00 AM' },
+    { id:'h_water', name:'Hydration', icon:'💧', reminder:'' },
+    { id:'h_stretch', name:'Stretch', icon:'🧘', reminder:'' },
+    { id:'h_night', name:'Night routine', icon:'🌙', reminder:'9:30 PM' }
   ];
+}
+function defaultAssignments(){
+  const t = todayKey();
+  return [
+    { id:'a_alg', title:'Algebra: Quadratics worksheet', subject:'Math', color:'#4C8DFF', due:shiftKey(t,1), done:false },
+    { id:'a_bio', title:'Biology lab report — cellular energy', subject:'Biology', color:'#3DDC97', due:shiftKey(t,4), done:false },
+    { id:'a_hist', title:'History reading + notes (pp. 142–160)', subject:'History', color:'#FF9F45', due:shiftKey(t,6), done:false },
+    { id:'a_span', title:'Spanish vocab set 7', subject:'Spanish', color:'#FF5C8A', due:shiftKey(t,3), done:false }
+  ];
+}
+function defaultGrades(){
+  return [
+    { id:'g_math', name:'Math', value:92 }, { id:'g_bio', name:'Biology', value:88 },
+    { id:'g_hist', name:'History', value:85 }, { id:'g_span', name:'Spanish', value:90 },
+    { id:'g_eng', name:'English', value:87 }
+  ];
+}
+function defaultWorkoutSchedule(difficulty = 'Beginner'){
+  const plan = WEEK_PLAN[difficulty] || WEEK_PLAN.Beginner;
+  return plan.map(title => ({
+    title,
+    minutes: /rest/i.test(title) ? 0 : /recovery|stretch|walk|mobility/i.test(title) ? 20 : 40
+  }));
+}
+function defaultSportSchedule(sport){
+  const sp = SPORTS[sport] || SPORTS.Basketball;
+  return [
+    { title:`${sp.drills[0].t} focus`, detail:'35 min · after school', minutes:35 },
+    { title:'Strength + mobility', detail:'30 min · gym or home', minutes:30 },
+    { title:sp.drills[1].n, detail:'25 min · skill block', minutes:25 },
+    { title:'Recovery + film study', detail:'20 min · low intensity', minutes:20 },
+    { title:'Team practice', detail:'90 min · full intensity', minutes:90 },
+    { title:'Game day', detail:'Warm-up + compete', minutes:60 },
+    { title:'Reset & mobility', detail:'15 min · easy', minutes:15 }
+  ];
+}
+function defaultSportGoals(sport){
+  const sp = SPORTS[sport] || SPORTS.Basketball;
+  return sp.goals.map((g, i) => ({ id:`sg_${sport.toLowerCase()}_${i}`, name:g.n, value:g.v, target:100, unit:'%', legacyLabel:g.label }));
+}
+
+function defaultState(){
+  return {
+    v: 2,
+    onboarded: false,
+    name: 'Alex',
+    age: '16–18',
+    interests: ['Strength','Sports','School','Discipline'],
+    sports: ['Basketball'],
+    experience: 'Beginner',
+    equipment: ['Bodyweight','Dumbbells'],
+    schoolGoals: ['Better grades','Homework on time'],
+    time: '40 minutes',
+    goal: 'Get stronger',
+    xpBase: 0,
+    xpLedger: {},
+    activeDays: {},
+    achievements: {},
+    habits: defaultHabits(),
+    habitLog: {},
+    tasksDone: {},
+    tasksDay: todayKey(),
+    water: 0,
+    waterGoal: 8,
+    difficulty: 'Beginner',
+    sport: 'Basketball',
+    customCards: [],
+    fcIndex: 0,
+    quizIndex: 0,
+    quizAnswer: null,
+    dayCelebrated: false,
+    assignments: defaultAssignments(),
+    grades: defaultGrades(),
+    workoutHistory: [],
+    workoutSchedule: defaultWorkoutSchedule('Beginner'),
+    scheduleCustom: false,
+    sportSchedules: {},
+    sportGoals: {},
+    drillsDone: {},
+    weekMinutes: [0,0,0,0,0,0,0],
+    settings: { reminders: true, haptics: true, accent: 'midnight' }
+  };
 }
 
 function defaultState(){
