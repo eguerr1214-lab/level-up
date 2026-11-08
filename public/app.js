@@ -331,7 +331,7 @@ function applyAccent(){
 }
 function syncSettingsUI(){
   const s = settings();
-  $('[data-setting]').forEach(el => {
+  $$('[data-setting]').forEach(el => {
     const on = !!s[el.dataset.setting];
     el.classList.toggle('on', on);
     el.setAttribute('aria-checked', on ? 'true' : 'false');
