@@ -330,13 +330,88 @@ function loadState(){
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return fresh();
-    const saved = JSON.parse(raw);
-    const merged = Object.assign(defaultState(), saved);
-    merged.assignments = Array.isArray(saved.assignments) ? saved.assignments : defaultAssignments();
-    merged.settings = Object.assign({ reminders: true, haptics: true, accent: 'midnight' }, saved.settings || {});
-    return merged;
+    const saved = JSON.parse(raw) || {};
+    return migrateState(saved, fresh());
   } catch(e){ return fresh(); }
 }
+
+/* Upgrade any earlier save into the v2 shape without dropping user data. */
+function migrateState(saved, base){
+  const s = Object.assign(base, saved);
+  s.v = 2;
+  s.xpLedger = Object.assign({}, saved.xpLedger || {});
+  s.activeDays = Object.assign({}, saved.activeDays || {});
+  s.achievements = Object.assign({}, saved.achievements || {});
+  s.habitLog = Object.assign({}, saved.habitLog || {});
+  s.tasksDone = Object.assign({}, saved.tasksDone || {});
+  s.drillsDone = Object.assign({}, saved.drillsDone || {});
+  s.sportSchedules = Object.assign({}, saved.sportSchedules || {});
+  s.sportGoals = Object.assign({}, saved.sportGoals || {});
+  s.workoutHistory = Array.isArray(saved.workoutHistory) ? saved.workoutHistory : [];
+  s.grades = Array.isArray(saved.grades) ? saved.grades : defaultGrades();
+  s.customCards = Array.isArray(saved.customCards) ? saved.customCards : [];
+  s.settings = Object.assign({ reminders: true, haptics: true, accent: 'midnight' }, saved.settings || {});
+
+  // v1 kept a plain `xp` counter and a fake streak. Keep the earned total, but
+  // turn it into a ledger so nothing can be awarded twice.
+  const legacyXp = Number.isFinite(saved.xp) ? saved.xp : (Number.isFinite(saved.xpBase) ? saved.xpBase : 0);
+  s.xpBase = Number.isFinite(saved.xpBase) ? saved.xpBase : Math.max(0, legacyXp);
+  delete s.xp;
+  delete s.streak;
+  delete s.habitsDone;
+  delete s.habitIcons;
+  delete s.habitReminders;
+  delete s.quizAwarded;
+
+  // v1 habits were plain strings.
+  if (!Array.isArray(saved.habits) || !saved.habits.length) {
+    s.habits = defaultHabits();
+  } else if (typeof saved.habits[0] === 'string') {
+    const icons = saved.habitIcons || {}, reminders = saved.habitReminders || {};
+    s.habits = saved.habits.map((name, i) => ({
+      id: 'h_' + String(name).toLowerCase().replace(/[^a-z0-9]+/g, '_'),
+      name, icon: icons[name] || HABIT_ICONS[i % HABIT_ICONS.length], reminder: reminders[name] || ''
+    }));
+  }
+
+  // v1 assignments stored display strings ("Tomorrow"); convert to real dates.
+  s.assignments = (Array.isArray(saved.assignments) ? saved.assignments : defaultAssignments()).map(a => {
+    const dueMap = { tomorrow: 1, monday: 6, tuesday: 5, wednesday: 4, thursday: 3, friday: 2 };
+    let due = a.due;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(due))) {
+      const key = String(due || '').toLowerCase().replace(/[^a-z]/g, '');
+      due = shiftKey(todayKey(), dueMap[key] != null ? dueMap[key] : 2);
+    }
+    return { id: a.id || uid('a'), title: a.title || 'Assignment', subject: a.subject || 'General',
+      color: a.color || SUBJECT_COLORS[0], due, done: !!a.done };
+  });
+
+  // Real weekly minutes start from stored history rather than sample bars.
+  if (!Array.isArray(saved.weekMinutes) || saved.weekMinutes.some(n => !Number.isFinite(n))) {
+    s.weekMinutes = [0,0,0,0,0,0,0];
+  }
+  if (!Array.isArray(s.workoutSchedule) || !s.workoutSchedule.length) {
+    s.workoutSchedule = defaultWorkoutSchedule(s.difficulty);
+  }
+  s.scheduleCustom = !!saved.scheduleCustom;
+
+  // Yesterday's completed daily tasks should not carry over as "done today".
+  if (saved.tasksDay !== todayKey()) {
+    s.tasksDone = {};
+    s.drillsDone = {};
+    s.tasksDay = todayKey();
+    s.water = 0;
+    s.dayCelebrated = false;
+  }
+
+  // Seed the ledger from anything already completed today so it cannot pay out twice.
+  Object.keys(s.tasksDone).forEach(id => { if (s.tasksDone[id]) s.xpLedger[taskKeyFor(id)] = TASK_XP[id] || 10; });
+  Object.keys(s.habitLog[todayKey()] || {}).forEach(hid => { if (s.habitLog[todayKey()][hid]) s.xpLedger[`habit:${hid}:${todayKey()}`] = HABIT_XP; });
+  Object.keys(s.drillsDone).forEach(d => { if (s.drillsDone[d]) s.xpLedger[`drill:${d}:${todayKey()}`] = DRILL_XP; });
+  s.assignments.forEach(a => { if (a.done) s.xpLedger[`assignment:${a.id}`] = ASSIGN_XP; });
+  return s;
+}
+
 function saveState(){
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){}
 }
