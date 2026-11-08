@@ -209,7 +209,12 @@ let state = loadState();
 function loadState(){
   const fresh = () => {
     const s = defaultState();
-    if (window.LEVELUP_USER && window.LEVELUP_USER.name) s.name = window.LEVELUP_USER.name;
+    if (window.LEVELUP_USER) {
+      // A signed-in account already has an identity, so skip the intro wizard.
+      // Personalization stays available from Profile → "Redo personalization".
+      if (window.LEVELUP_USER.name) s.name = window.LEVELUP_USER.name;
+      s.onboarded = true;
+    }
     return s;
   };
   try {
