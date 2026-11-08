@@ -657,3 +657,71 @@ button.pill-tag:hover{color:var(--txt);border-color:var(--line2)}
 /* ============ ACCENT THEMES ============ */
 #phone[data-accent="violet"]{--blue:#9B5CFF;--blue2:#7C3AED;--purple:#38E0CE;--violet:#9B5CFF;--grad:linear-gradient(135deg,#7C3AED 0%,#38E0CE 100%)}
 #phone[data-accent="sunset"]{--blue:#FF9F45;--blue2:#FF5C8A;--purple:#FF5C8A;--violet:#FF9F45;--grad:linear-gradient(135deg,#FF9F45 0%,#FF5C8A 100%)}
+
+/* ============ FUNCTIONAL ADD-ONS (habits, school, fitness, sports) ============ */
+.mt8{margin-top:8px}
+.empty-note{font-size:11px;line-height:1.55;color:var(--muted);padding:10px 2px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn-row .btn{flex:1 1 44%}
+.icon-btn.sm{width:26px;height:26px;font-size:11px;border-radius:8px;display:grid;place-items:center;flex:none}
+.icon-btn.sm:hover{color:#fff;border-color:var(--line2);background:rgba(255,255,255,.05)}
+
+/* habit rows */
+.habit-week{display:flex;gap:3px;margin-left:auto;flex:none}
+.habit-week i{width:6px;height:6px;border-radius:2px;background:rgba(255,255,255,.12)}
+.habit-week i.on{background:linear-gradient(180deg,#4C8DFF,#9B5CFF);box-shadow:0 0 6px rgba(110,130,255,.4)}
+
+/* school filters */
+.filter-row{margin-bottom:10px;flex-wrap:nowrap}
+.filter-row .chip{white-space:nowrap;flex:none}
+.chip.on{background:linear-gradient(135deg,rgba(76,141,255,.22),rgba(155,92,255,.22));border-color:rgba(110,130,255,.45);color:#fff}
+
+/* fitness history */
+.hist-row{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line)}
+.hist-row:last-child{border-bottom:0}
+.hist-ico{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:13px;flex:none;background:rgba(76,141,255,.12);border:1px solid rgba(76,141,255,.22)}
+.hist-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.hist-body b{font-size:11.5px;font-weight:600;color:#E6EBF6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-body span{font-size:9.5px;color:var(--muted2)}
+.hist-xp{font-size:10px;font-weight:700;color:#3DDC97;flex:none}
+
+/* sports goal controls */
+.goal-actions{display:flex;gap:6px;flex:none}
+.goal-actions button{width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);font:inherit;font-size:12px;line-height:1;cursor:pointer}
+.goal-actions button:hover{color:#fff;border-color:var(--line2);background:rgba(255,255,255,.07)}
+
+/* exercise library sheet */
+.lib-group{margin-bottom:14px}
+.lib-group:last-child{margin-bottom:0}
+.lib-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.lib-head b{font-size:12px;letter-spacing:.2px}
+.lib-head .tiny{font-size:9px;letter-spacing:.6px;color:var(--muted2);text-transform:uppercase}
+.lib-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.lib-row:last-child{border-bottom:0}
+.lib-ico{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:13px;flex:none;background:rgba(155,92,255,.12);border:1px solid rgba(155,92,255,.22)}
+.lib-row .t-body{flex:1;min-width:0}
+.lib-row .t-label{font-size:11.5px;font-weight:600}
+.lib-row .t-sub{font-size:9.5px;color:var(--muted2);margin-top:2px}
+
+/* dashboard workout hero */
+.big-workout{position:relative;overflow:hidden}
+.b-track{position:relative;height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:10px}
+.b-track i{position:absolute;inset:0 auto 0 0;border-radius:99px;background:linear-gradient(90deg,#4C8DFF,#9B5CFF)}
+.s-start-wrap{display:flex;gap:8px;margin-top:12px}
+
+/* sheets: selects match text inputs */
+select.mini-input{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 16px) 52%,calc(100% - 11px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+
+/* tablet + desktop comfort */
+@media (min-width:700px){
+  .btn-row .btn{flex:1 1 auto}
+  .filter-row{flex-wrap:wrap}
+}
+@media (max-width:420px){
+  .hist-row,.lib-row{padding:9px 0}
+  .goal-actions button{width:26px;height:26px}
+  .habit-week i{width:5px;height:5px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+}
