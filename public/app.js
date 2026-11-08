@@ -1668,7 +1668,7 @@ function coachReply(raw){
     ${esc(sp.note)}`;
   }
   if (/motiv|discipline|consistent|lazy|quit|give up|hard|can't|stuck/.test(t)) {
-    return `You're on a <b>${state.streak}-day streak</b>. That didn't happen by accident — it happened because you showed up on days you didn't feel like it.<br><br>
+    return `You're on a <b>${currentStreak()}-day streak</b>. That didn't happen by accident — it happened because you showed up on days you didn't feel like it.<br><br>
     Today doesn't need to be impressive. It needs to be <b>non-zero</b>. Do the smallest real version: one study block, one set, one glass of water.<br><br>
     The goal isn't perfection. It's proving to yourself that you don't disappear when it gets boring.`;
   }
@@ -1677,7 +1677,7 @@ function coachReply(raw){
     Pair it with your study blocks: finish a block, finish a glass. Easier than remembering out of nowhere.`;
   }
   if (/progress|level|xp|streak|badge|improving/.test(t)) {
-    return `You're <b>Level ${li.level} · ${li.name}</b> with <b>${fmt(totalXp())} XP</b> and a <b>${state.streak}-day streak</b>.<br><br>
+    return `You're <b>Level ${li.level} · ${li.name}</b> with <b>${fmt(totalXp())} XP</b> and a <b>${currentStreak()}-day streak</b>.<br><br>
     Today: ${tasksDoneCount()}/5 goals complete. You're <b>${li.need} XP</b> from Level ${li.level + 1}. The fastest path: finish your workout (+40), your study block (+30), and your sport drills (+25).<br><br>
     More importantly, you've trained ${state.weekMinutes.filter(m => m > 0).length} days this week — consistency is the real score.`;
   }
