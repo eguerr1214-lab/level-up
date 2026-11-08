@@ -520,25 +520,31 @@ function makeTasks(){
 }
 function taskById(id){ return makeTasks().find(t => t.id === id); }
 function tasksDoneCount(){ return makeTasks().filter(t => state.tasksDone[t.id]).length; }
-function addXp(amount){
-  const before = levelInfo(totalXp()).level;
-  state.xp = Math.max(0, state.xp + amount);
-  const after = levelInfo(totalXp()).level;
-  if (after > before) {
-    setTimeout(() => { toast(`Level ${after} unlocked — ${levelInfo(totalXp()).name}!`, '👑'); confetti(); }, 350);
+/* Rolls daily state over when the calendar day changes (prevents stale "done" ticks). */
+function ensureDay(){
+  const key = todayKey();
+  if (state.tasksDay !== key) {
+    state.tasksDay = key;
+    state.tasksDone = {};
+    state.drillsDone = {};
+    state.water = 0;
+    state.dayCelebrated = false;
   }
+  if (!state.habitLog[key]) state.habitLog[key] = {};
 }
+
 function setTaskDone(id, done, opts = {}){
   const t = taskById(id);
   if (!t) return;
+  ensureDay();
+  const key = taskKeyFor(id);
   if (done && !state.tasksDone[id]) {
     state.tasksDone[id] = true;
-    addXp(t.xp);
-    if (!opts.silent) toast(`+${t.xp} XP · ${t.label.split('—')[0].trim()}`, '✦');
-    if (!opts.silent) haptic();
+    awardXp(key, t.xp, t.label.split('—')[0].trim(), '✦', opts);
+    if (id === 'workout') recordWorkout({ source: 'daily', title: t.label, minutes: currentWorkout().dur });
   } else if (!done && state.tasksDone[id]) {
     delete state.tasksDone[id];
-    addXp(-t.xp);
+    revokeXp(key);
   }
   if (!done) state.dayCelebrated = false;
   if (done && !state.dayCelebrated && makeTasks().every(x => state.tasksDone[x.id])) {
@@ -547,17 +553,158 @@ function setTaskDone(id, done, opts = {}){
   }
   saveState();
 }
-function toggleHabit(name){
-  if (state.habitsDone[name]) { delete state.habitsDone[name]; addXp(-5); }
-  else { state.habitsDone[name] = true; addXp(5); toast('+5 XP · Habit complete', '✓'); haptic(); }
+
+/* ---------- habits ---------- */
+function habitDoneToday(id){ ensureDay(); return !!(state.habitLog[todayKey()] || {})[id]; }
+function habitWeek(id){
+  const out = [];
+  const { mondayIndex } = nowParts();
+  for (let i = 0; i < 7; i++) {
+    const key = shiftKey(todayKey(), i - mondayIndex);
+    out.push(!!((state.habitLog[key] || {})[id]));
+  }
+  return out;
+}
+function habitStreak(id){
+  let key = todayKey(), streak = 0;
+  if (!((state.habitLog[key] || {})[id])) key = shiftKey(key, -1);
+  while ((state.habitLog[key] || {})[id]) { streak++; key = shiftKey(key, -1); }
+  return streak;
+}
+function toggleHabit(id){
+  ensureDay();
+  const day = state.habitLog[todayKey()];
+  const key = `habit:${id}:${todayKey()}`;
+  const habit = state.habits.find(h => h.id === id);
+  if (day[id]) { delete day[id]; revokeXp(key); }
+  else {
+    day[id] = true;
+    awardXp(key, HABIT_XP, habit ? habit.name : 'Habit complete', '✓');
+  }
   saveState(); renderHome(); renderProfile();
 }
+function saveHabit(data){
+  ensureDay();
+  if (data.id) {
+    const h = state.habits.find(x => x.id === data.id);
+    if (h) Object.assign(h, { name: data.name, icon: data.icon, reminder: data.reminder });
+    toast('Habit updated', '✓');
+  } else {
+    state.habits.push({ id: uid('h'), name: data.name, icon: data.icon, reminder: data.reminder });
+    toast('Habit added', '✓');
+  }
+  saveState(); renderHome(); renderProfile();
+}
+function deleteHabit(id){
+  state.habits = state.habits.filter(h => h.id !== id);
+  Object.keys(state.habitLog).forEach(day => { delete state.habitLog[day][id]; });
+  Object.keys(state.xpLedger).forEach(k => { if (k.startsWith(`habit:${id}:`)) delete state.xpLedger[k]; });
+  toast('Habit deleted', '🗑');
+  saveState(); renderHome(); renderProfile();
+}
+
+/* ---------- school ---------- */
+function subjects(){
+  const set = new Set(state.assignments.map(a => a.subject));
+  return [...set];
+}
+function colorForSubject(subject){
+  const idx = subjects().indexOf(subject);
+  return SUBJECT_COLORS[(idx < 0 ? 0 : idx) % SUBJECT_COLORS.length];
+}
+function saveAssignment(data){
+  if (data.id) {
+    const a = state.assignments.find(x => x.id === data.id);
+    if (a) Object.assign(a, data, { color: colorForSubject(data.subject) });
+    toast('Assignment updated', '✓');
+  } else {
+    state.assignments.push({
+      id: uid('a'), title: data.title, subject: data.subject, color: colorForSubject(data.subject),
+      due: data.due, done: false
+    });
+    toast('Assignment added', '✓');
+  }
+  saveState(); renderSchool(); renderHome(); renderProfile();
+}
+function toggleAssignment(id){
+  const a = state.assignments.find(x => x.id === id);
+  if (!a) return;
+  a.done = !a.done;
+  if (a.done) awardXp(`assignment:${id}`, ASSIGN_XP, 'Assignment complete', '🎓');
+  else revokeXp(`assignment:${id}`);
+  saveState(); renderSchool(); renderHome(); renderProfile();
+}
+function deleteAssignment(id){
+  state.assignments = state.assignments.filter(a => a.id !== id);
+  revokeXp(`assignment:${id}`);
+  toast('Assignment deleted', '🗑');
+  saveState(); renderSchool(); renderHome(); renderProfile();
+}
+function dueLabel(due){
+  const diff = Math.round((dateFromKey(due) - dateFromKey(todayKey())) / 86400000);
+  if (diff < 0) return { text: `${Math.abs(diff)}d overdue`, cls: 'over' };
+  if (diff === 0) return { text: 'Due today', cls: 'soon' };
+  if (diff === 1) return { text: 'Due tomorrow', cls: 'soon' };
+  if (diff <= 3) return { text: `Due in ${diff}d`, cls: 'soon' };
+  return { text: `Due ${dateFromKey(due).toLocaleDateString('en-US', { month:'short', day:'numeric' })}`, cls: '' };
+}
+
+/* ---------- fitness ---------- */
+function recordWorkout(entry){
+  ensureDay();
+  const rec = {
+    id: uid('w'), day: todayKey(), title: entry.title || 'Workout',
+    minutes: Number(entry.minutes) || 0, source: entry.source || 'plan'
+  };
+  state.workoutHistory = [rec, ...(state.workoutHistory || [])].slice(0, 120);
+  const { mondayIndex } = nowParts();
+  state.weekMinutes[mondayIndex] = (state.weekMinutes[mondayIndex] || 0) + rec.minutes;
+  return rec;
+}
+function workoutsThisWeek(){
+  const start = shiftKey(todayKey(), -nowParts().mondayIndex);
+  return (state.workoutHistory || []).filter(w => w.day >= start);
+}
+function weekMinutesTotal(){ return (state.weekMinutes || []).reduce((a, b) => a + b, 0); }
+
+/* ---------- sports ---------- */
+function scheduleFor(sport = sportName()){
+  if (!state.sportSchedules[sport]) state.sportSchedules[sport] = defaultSportSchedule(sport);
+  return state.sportSchedules[sport];
+}
+function goalsFor(sport = sportName()){
+  if (!state.sportGoals[sport]) state.sportGoals[sport] = defaultSportGoals(sport);
+  return state.sportGoals[sport];
+}
+function setSport(sport){
+  if (!SPORTS[sport]) return;
+  state.sport = sport;
+  state.drillsDone = {};
+  if (!state.sports.includes(sport)) state.sports = [sport, ...state.sports].slice(0, 3);
+  scheduleFor(sport); goalsFor(sport);
+  saveState(); renderSports(); renderHome();
+}
+function logGoalProgress(id, delta){
+  const goal = goalsFor().find(g => g.id === id);
+  if (!goal) return;
+  const before = goal.value;
+  goal.value = Math.max(0, Math.min(100, goal.value + delta));
+  if (goal.value > before) awardXp(`goal:${id}:${todayKey()}`, 3, goal.name, '🎯', { silent: true });
+  else revokeXp(`goal:${id}:${todayKey()}`);
+  saveState(); renderSports(); renderProfile();
+}
 function toggleDrill(i){
+  ensureDay();
   const key = `${state.sport}-${i}`;
-  if (state.drillsDone[key]) { delete state.drillsDone[key]; addXp(-10); }
-  else { state.drillsDone[key] = true; addXp(10); toast('+10 XP · Drill complete', '🏆'); haptic(); }
+  const drill = currentSport().drills[i];
+  if (state.drillsDone[key]) { delete state.drillsDone[key]; revokeXp(`drill:${key}:${todayKey()}`); }
+  else {
+    state.drillsDone[key] = true;
+    awardXp(`drill:${key}:${todayKey()}`, DRILL_XP, drill ? drill.n : 'Drill complete', '🏆');
+  }
   saveState(); renderSports(); renderHome(); renderProfile();
 }
+
 function haptic(){ if (!settings().haptics) return; if (navigator.vibrate) try { navigator.vibrate(8); } catch(e){} }
 
 /* ---------- settings, appearance, privacy, account ---------- */
