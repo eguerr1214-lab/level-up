@@ -1451,9 +1451,7 @@ function toggleFocus(){
       stopFocus();
       focusLeft = 0;
       updateFocusUI();
-      addXp(20);
-      toast('Focus session complete +20 XP', '🎯');
-      confetti();
+      awardXp(`focus:${todayKey()}:${Date.now()}`, 20, 'Focus session completed', '🎯');
       saveState();
       renderProfile();
       setTimeout(() => { focusLeft = focusTotal; updateFocusUI(); }, 1800);
@@ -1544,13 +1542,8 @@ function finishWorkout(){
   closePlayer();
   const w = currentWorkout();
   const already = !!state.tasksDone.workout;
-  state.weekMinutes[(nowParts().mondayIndex)] = Math.max(state.weekMinutes[(nowParts().mondayIndex)], w.dur);
-  if (!already) {
-    setTaskDone('workout', true, { silent:true });
-    toast(`Workout complete · +40 XP · ${w.dur} min logged`, '🏆');
-  } else {
-    toast('Workout logged — extra volume never hurts', '🏆');
-  }
+  recordWorkout({ id: `w:${todayKey()}:${Date.now()}`, name: w.name, minutes: w.dur, date: todayKey() });
+  if (!already) setTaskDone('workout', true, { silent:true });
   saveState();
   renderAll();
   confetti();
