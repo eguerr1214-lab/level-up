@@ -1883,38 +1883,41 @@ $('#editProfile').addEventListener('click', () => { onbEditing = true; syncOnbFr
 let miniEmoji = '✨';
 function openMini(){ $('#miniSheet').classList.add('open'); $('#miniBackdrop').classList.add('open'); }
 function closeMini(){ $('#miniSheet').classList.remove('open'); $('#miniBackdrop').classList.remove('open'); }
-function openHabitSheet(){
-  miniEmoji = '✨';
-  $('#miniTitle').textContent = 'Create a habit';
+let editingHabitId = null;
+function openHabitSheet(id){
+  const habit = id ? state.habits.find(h => h.id === id) : null;
+  editingHabitId = habit ? habit.id : null;
+  miniEmoji = habit ? habit.icon : '✨';
+  $('#miniTitle').textContent = habit ? 'Edit habit' : 'Create a habit';
   $('#miniContent').innerHTML = `
     <label class="mini-label" for="miniHabitName">Habit name</label>
-    <input class="mini-input" id="miniHabitName" maxlength="32" placeholder="e.g. Read 10 pages before bed" autocomplete="off">
+    <input class="mini-input" id="miniHabitName" maxlength="32" value="${habit ? esc(habit.name) : ''}" placeholder="e.g. Read 10 pages before bed" autocomplete="off">
     <label class="mini-label">Pick an icon</label>
     <div class="emoji-pick" id="miniEmojiPick">
       ${['🌅','🌙','💧','🧘','📓','📖','📵','🥗','🏃','🧠'].map(e => `<button type="button" data-emoji="${e}" class="${e === miniEmoji ? 'active' : ''}">${e}</button>`).join('')}
     </div>
     <label class="mini-label" for="miniReminder">Reminder (optional)</label>
-    <input class="mini-input" id="miniReminder" maxlength="24" placeholder="e.g. 7:30 AM — before school" autocomplete="off">
-    <button class="btn primary mini-save" id="miniSaveHabit">Add habit</button>`;
-  $$('#miniEmojiPick button').forEach(b => b.addEventListener('click', () => {
+    <input class="mini-input" id="miniReminder" maxlength="24" value="${habit && habit.reminder ? esc(habit.reminder) : ''}" placeholder="e.g. 7:30 AM — before school" autocomplete="off">
+    <button class="btn primary mini-save" id="miniSaveHabit">${habit ? 'Save changes' : 'Add habit'}</button>
+    ${habit ? '<button class="btn ghost full sm mt8" id="miniDeleteHabit">Delete habit</button>' : ''}`;
+  $('#miniEmojiPick button').forEach(b => b.addEventListener('click', () => {
     miniEmoji = b.dataset.emoji;
-    $$('#miniEmojiPick button').forEach(x => x.classList.toggle('active', x === b));
+    $('#miniEmojiPick button').forEach(x => x.classList.toggle('active', x === b));
   }));
-  $('#miniSaveHabit').addEventListener('click', saveHabit);
+  $('#miniSaveHabit').addEventListener('click', saveHabitSheet);
+  const del = $('#miniDeleteHabit');
+  if (del) del.addEventListener('click', () => { deleteHabit(editingHabitId); closeMini(); });
   openMini();
   setTimeout(() => $('#miniHabitName').focus(), 350);
 }
-function saveHabit(){
+function saveHabitSheet(){
   const name = $('#miniHabitName').value.trim();
   if (!name) { toast('Give your habit a name first', '✏️'); return; }
-  if (state.habits.some(h => h.toLowerCase() === name.toLowerCase())) { toast('That habit is already on your list', '👀'); return; }
-  if (state.habits.length >= 8) { toast('8 habits is plenty — quality over quantity', '🎯'); return; }
-  state.habits.push(name);
-  state.habitIcons[name] = miniEmoji;
-  const reminder = $('#miniReminder').value.trim();
-  if (reminder) state.habitReminders[name] = reminder;
-  saveState(); closeMini(); renderHome(); renderProfile();
-  toast('Habit added — check it off for +5 XP', '✨');
+  const dupe = state.habits.some(h => h.id !== editingHabitId && h.name.toLowerCase() === name.toLowerCase());
+  if (dupe) { toast('That habit is already on your list', '👀'); return; }
+  if (!editingHabitId && state.habits.length >= 8) { toast('8 habits is plenty — quality over quantity', '🎯'); return; }
+  saveHabit({ id: editingHabitId, name, icon: miniEmoji, reminder: $('#miniReminder').value.trim() });
+  closeMini();
   haptic();
 }
 function openCardSheet(){
