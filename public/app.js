@@ -905,7 +905,7 @@ function renderHome(){
   $('#homeAvatar').textContent = initial();
   $('#profileAvatar').textContent = initial();
   $('#homeLevelPin').textContent = li.level;
-  $('#homeStreak').textContent = state.streak;
+  $('#homeStreak').textContent = currentStreak();
   $('#homeXp').textContent = fmt(totalXp());
 
   const tasks = makeTasks();
