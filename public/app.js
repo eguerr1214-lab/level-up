@@ -369,12 +369,12 @@ function openAppearanceSheet(){
         </button>`).join('')}
     </div>
     <p class="tiny" style="margin-top:14px;line-height:1.6">The accent changes buttons, highlights and the gradient behind your stats across the whole app.</p>`;
-  $('#miniContent [data-accent-opt]').forEach(btn => btn.addEventListener('click', () => {
+  $$('#miniContent [data-accent-opt]').forEach(btn => btn.addEventListener('click', () => {
     settings().accent = btn.dataset.accentOpt;
     saveState();
     applyAccent();
     syncSettingsUI();
-    $('#miniContent [data-accent-opt]').forEach(x => {
+    $$('#miniContent [data-accent-opt]').forEach(x => {
       const sel = x === btn;
       x.classList.toggle('selected', sel);
       x.setAttribute('aria-pressed', sel ? 'true' : 'false');
