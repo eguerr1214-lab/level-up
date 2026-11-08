@@ -1207,26 +1207,42 @@ function radarSVG(values){
 function renderSchool(){
   const pending = state.assignments.filter(a => !a.done).length;
   $('#assignCount').textContent = pending ? `${pending} due` : 'All done';
-  $('#assignmentList').innerHTML = state.assignments.map(a => `
-    <div class="assignment ${a.done ? 'done' : ''}">
-      <button class="check" onclick="toggleAssignment('${a.id}')" style="${a.done ? 'background:var(--grad);border-color:transparent;color:#fff' : ''}">${svgCheck()}</button>
+
+  const filter = state.schoolFilter || 'all';
+  const subs = subjects();
+  const filterEl = $('#subjectFilter');
+  if (filterEl) {
+    filterEl.innerHTML = ['all', ...subs].map(s => `<button class="chip ${filter === s ? 'active' : ''}" data-subject-filter="${esc(s)}">${s === 'all' ? 'All subjects' : esc(s)}</button>`).join('');
+  }
+  const list = state.assignments
+    .filter(a => filter === 'all' || a.subject === filter)
+    .sort((a, b) => (a.done - b.done) || String(a.due).localeCompare(String(b.due)));
+
+  $('#assignmentList').innerHTML = list.length ? list.map(a => {
+    const due = dueLabel(a.due);
+    return `<div class="assignment ${a.done ? 'done' : ''}">
+      <button class="check" onclick="toggleAssignment('${a.id}')" aria-label="Complete ${esc(a.title)}" style="${a.done ? 'background:var(--grad);border-color:transparent;color:#fff' : ''}">${svgCheck()}</button>
       <div class="subject-dot" style="background:${a.color}"></div>
       <div class="t-body">
         <div class="t-label">${esc(a.title)}</div>
-        <div class="t-sub">${esc(a.subject)} · <span class="due ${a.dueClass}">${esc(a.due)}</span></div>
+        <div class="t-sub">${esc(a.subject)} · <span class="due ${due.cls}">${esc(due.text)}</span></div>
       </div>
-      <button class="tiny" style="color:var(--muted2)" onclick="askCoach('Help me with ${esc(a.subject)} homework')">Ask AI</button>
-    </div>`).join('');
+      <button class="icon-btn sm" data-assignment-edit="${a.id}" aria-label="Edit ${esc(a.title)}">✎</button>
+    </div>`;
+  }).join('') : `<div class="empty-note">Nothing here yet. Tap “Add assignment” to plan your work.</div>`;
 
-  $('#studyPlan').innerHTML = [
-    { t:'4:00 PM', n:'Algebra — quadratics review', s:'25 min · focus timer' },
-    { t:'4:30 PM', n:'Flashcards — cellular energy', s:'15 min · active recall' },
-    { t:'5:30 PM', n:'Training window', s:'45 min · ' + currentWorkout().name },
-    { t:'7:00 PM', n:'Biology lab report outline', s:'30 min · deep work' }
-  ].map((r, i) => `<div class="schedule-row" style="padding:7px 0">
-      <div class="sch-day" style="width:48px"><b style="font-size:9px;color:${i === 0 ? '#8FE9D6' : 'var(--muted)'}">${esc(r.t)}</b></div>
-      <div class="sch-bar" style="background:${i === 1 ? 'rgba(56,224,206,.07)' : 'rgba(255,255,255,.035)'}"><div><b>${esc(r.n)}</b><span>${esc(r.s)}</span></div></div>
-    </div>`).join('');
+  /* Study blocks are built from real upcoming work, not sample text. */
+  const upcoming = state.assignments.filter(a => !a.done)
+    .sort((a, b) => String(a.due).localeCompare(String(b.due))).slice(0, 3);
+  const slots = ['4:00 PM', '5:00 PM', '6:30 PM'];
+  $('#studyPlan').innerHTML = upcoming.length ? upcoming.map((a, i) => `
+    <div class="schedule-row" style="padding:7px 0">
+      <div class="sch-day" style="width:48px"><b style="font-size:9px;color:${i === 0 ? '#8FE9D6' : 'var(--muted)'}">${slots[i]}</b></div>
+      <div class="sch-bar" style="background:${i === 1 ? 'rgba(56,224,206,.07)' : 'rgba(255,255,255,.035)'}">
+        <div><b>${esc(a.title)}</b><span>25 min · ${esc(a.subject)}</span></div>
+        <button class="icon-btn sm" data-focus="${a.id}" aria-label="Start focus session">▶</button>
+      </div>
+    </div>`).join('') : `<div class="empty-note">No open assignments — your study block is clear.</div>`;
 
   const cards = getCards();
   if (state.fcIndex > cards.length - 1) state.fcIndex = 0;
@@ -1234,6 +1250,8 @@ function renderSchool(){
   $('#fcQuestion').textContent = card.q;
   $('#fcAnswer').textContent = card.a;
   $('#fcDots').innerHTML = cards.map((_, i) => `<i class="${i === state.fcIndex ? 'on' : ''}"></i>`).join('');
+  const fcEdit = $('#editCardBtn');
+  if (fcEdit) fcEdit.style.display = state.fcIndex >= FLASHCARDS.length ? '' : 'none';
 
   const q = QUIZ[state.quizIndex];
   const answered = state.quizAnswer !== null;
@@ -1251,16 +1269,19 @@ function renderSchool(){
     ${answered ? `<div class="sub" style="font-size:11px;line-height:1.5;margin-top:9px;color:${state.quizAnswer === q.answer ? '#7DE8BB' : '#FFB8C9'}">${state.quizAnswer === q.answer ? 'Correct! ' : 'Not quite. '}${esc(q.why)}</div>
       <button class="btn ghost full sm mt10" onclick="nextQuiz()">Try another question</button>` : ''}`;
 
-  const grades = [
-    { n:'Math', v:92, g:'A−' }, { n:'Biology', v:88, g:'B+' }, { n:'History', v:85, g:'B' },
-    { n:'Spanish', v:90, g:'A−' }, { n:'English', v:87, g:'B+' }
-  ];
-  $('#gradeList').innerHTML = grades.map(g => `
+  $('#gradeList').innerHTML = state.grades.map(g => `
     <div class="grade-row">
-      <span class="gname">${g.n}</span>
-      <div class="track"><i style="width:${g.v}%"></i></div>
-      <span class="gval">${g.g}</span>
+      <span class="gname">${esc(g.name)}</span>
+      <div class="track"><i style="width:${Math.max(0, Math.min(100, g.value))}%"></i></div>
+      <span class="gval">${gradeLetter(g.value)}</span>
+      <button class="icon-btn sm" data-grade-edit="${g.id}" aria-label="Edit ${esc(g.name)} grade">✎</button>
     </div>`).join('');
+}
+
+function gradeLetter(v){
+  if (v >= 93) return 'A'; if (v >= 90) return 'A−'; if (v >= 87) return 'B+';
+  if (v >= 83) return 'B'; if (v >= 80) return 'B−'; if (v >= 77) return 'C+';
+  if (v >= 70) return 'C'; return 'D';
 }
 
 function renderProfile(){
