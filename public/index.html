@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#06070A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LEVEL UP">
+<title>LEVEL UP — Your AI Personal Coach</title>
+<meta name="description" content="LEVEL UP is an AI personal coach for training, school, sports and habits. Sign in to sync your plan, or try the demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="ambient"></div>
+  <div class="noise"></div>
+  <div class="top-scrim"></div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4C8DFF"/><stop offset="100%" stop-color="#B98CFF"/></linearGradient>
+      <linearGradient id="sparkGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4C8DFF"/><stop offset="100%" stop-color="#B98CFF"/></linearGradient>
+      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7C9BFF" stop-opacity=".28"/><stop offset="100%" stop-color="#7C9BFF" stop-opacity="0"/></linearGradient>
+    </defs>
+  </svg>
+
+  <div class="statusbar">
+    <span id="sbTime">9:41</span>
+    <div class="sb-right">
+      <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.3" y="5" width="3" height="6" rx="1"/><rect x="8.6" y="2.5" width="3" height="8.5" rx="1"/><rect x="12.9" y="0" width="3" height="11" rx="1"/></svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="currentColor"><path d="M7.5 1.6c2.1 0 4 .8 5.4 2.1l1.1-1.1C12.4 1 10.1 0 7.5 0S2.6 1 1 2.6l1.1 1.1C3.5 2.4 5.4 1.6 7.5 1.6zm0 3.4c1.3 0 2.4.5 3.2 1.3l1.1-1.1C10.6 4.1 9.1 3.5 7.5 3.5S4.4 4.1 3.2 5.2l1.1 1.1c.8-.8 1.9-1.3 3.2-1.3zm0 3.2c.5 0 .9.2 1.2.5L7.5 10 6.3 8.7c.3-.3.7-.5 1.2-.5z"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/><path d="M23 4v4c.8-.3 1.3-1.1 1.3-2S23.8 4.3 23 4z" fill="currentColor" opacity=".5"/></svg>
+    </div>
+  </div>
+
+  <div class="screens" id="screens">
+
+    <!-- ============ HOME ============ -->
+    <section class="screen active screen-stagger" id="screen-home">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow" id="homeDate">Tuesday, Nov 12</div>
+          <h1 class="h1"><span id="greetWord">Good morning</span>,<br><span class="grad" id="homeName">Alex</span></h1>
+        </div>
+        <button class="avatar-btn" data-nav="profile" aria-label="Profile">
+          <div class="avatar" id="homeAvatar">A</div>
+          <span class="lvl-pin" id="homeLevelPin">7</span>
+        </button>
+      </header>
+
+      <div class="stat-strip">
+        <div class="stat-pill">
+          <div class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2s5 3.5 5 8a5 5 0 0 1-10 0c0-1.5.5-2.7 1-3.6.2 1.4 1 2.3 1.8 2.6C10 7 11 4.6 12 2z"/><path d="M12 13.5c1.7 1.3 2.6 2.7 2.6 4.2A2.6 2.6 0 0 1 12 20.3a2.6 2.6 0 0 1-2.6-2.6c0-1.5.9-2.9 2.6-4.2z" opacity=".6"/></svg></div>
+          <div><b id="homeStreak">12</b><span>day streak</span></div>
+        </div>
+        <div class="stat-pill blue">
+          <div class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
+          <div><b id="homeXp">1,240</b><span>total XP</span></div>
+        </div>
+      </div>
+
+      <div class="card hero">
+        <div class="hero-glow"></div>
+        <div class="hero-main">
+          <div class="ring" id="homeRing" style="--p:0">
+            <svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="prog" cx="60" cy="60" r="52"/></svg>
+            <div class="ring-label"><b id="ringPct">0%</b><span>today</span></div>
+          </div>
+          <div class="hero-copy">
+            <div class="hero-kicker">TODAY'S MOMENTUM</div>
+            <div class="hero-title" id="heroTitle">You're on track</div>
+            <p id="heroSub">3 of 5 goals complete. Keep the chain alive.</p>
+            <div class="xp-mini"><span class="dot"></span><span id="heroXp">+70 XP earned today</span></div>
+          </div>
+        </div>
+        <div class="hero-foot">
+          <div class="hf"><b id="hfGoals">3/5</b><span>goals</span></div>
+          <div class="sep"></div>
+          <div class="hf"><b id="hfWorkout">1</b><span>workout</span></div>
+          <div class="sep"></div>
+          <div class="hf"><b id="hfFocus">45m</b><span>focus</span></div>
+        </div>
+      </div>
+
+      <div class="card ai-card">
+        <div class="ai-head">
+          <div class="ai-orb"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.6L19.5 9l-5.7 1.4L12 16l-1.8-5.6L4.5 9l5.7-1.4L12 2z"/><path d="M19 15l.9 2.6L22.5 18l-2.6.9L19 22l-.9-3.1L15.5 18l2.6-.9L19 15z" opacity=".65"/></svg></div>
+          <div><b>AI Coach</b><span>Personalized for today</span></div>
+          <button class="ai-open" id="openCoachTop">Open</button>
+        </div>
+        <p class="ai-rec" id="aiRec">You have <b>2 assignments</b> due this week, so I moved your training to 5:30 PM — right after your study block.</p>
+        <div class="ai-tags" id="aiTags"></div>
+        <div class="ai-actions">
+          <button data-coach="Build my plan for today">Plan my day</button>
+          <button data-coach="I'm low on energy today">I'm tired</button>
+          <button data-coach="Reschedule my workout">Reschedule</button>
+        </div>
+      </div>
+
+      <div class="sec-head"><h2 class="h2">Daily goals</h2><span class="meta" id="goalsCount">0/5</span></div>
+      <div class="card list-card" id="taskList"></div>
+
+      <div class="sec-head"><h2 class="h2">Today's training</h2><button class="link" data-nav="fitness">All plans →</button></div>
+      <div class="card workout-card" id="homeWorkout"></div>
+
+      <div class="sec-head"><h2 class="h2">Study block</h2><button class="link" data-nav="school">School →</button></div>
+      <div class="card study-card" id="homeStudy"></div>
+
+      <div class="sec-head"><h2 class="h2">Healthy habits</h2><span class="meta" id="habitCount">0/4</span></div>
+      <div class="card habit-card">
+        <div class="water-box">
+          <div class="water-top"><b>💧 Hydration</b><span id="waterLabel">3 / 8 glasses</span></div>
+          <div class="water-row" id="waterRow"></div>
+        </div>
+        <div id="habitList"></div>
+        <button class="btn ghost full sm" id="addHabitBtn" style="margin-top:12px">＋ Add your own habit</button>
+        <div class="row-between" style="margin-top:14px"><span class="tiny" style="letter-spacing:1.1px">LAST 14 DAYS</span><span class="tiny" id="habitConsistency" style="color:#9FB6FF;font-weight:600">86% this month</span></div>
+        <div class="heat" id="habitHeat"></div>
+      </div>
+
+      <div class="quote-card">
+        <div class="quote-mark">”</div>
+        <p id="quoteText">Small steps, repeated daily, become the identity you're building.</p>
+        <span id="quoteAuthor">LEVEL UP · DAILY REMINDER</span>
+      </div>
+    </section>
+
+    <!-- ============ FITNESS ============ -->
+    <section class="screen screen-stagger" id="screen-fitness">
+      <header class="page-head">
+        <div><div class="eyebrow">Train with purpose</div><h1 class="h1">Fitness</h1></div>
+        <div class="head-chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2.5" y="9.4" width="3.2" height="5.2" rx="1.3" fill="currentColor" stroke="none"/><rect x="6.3" y="7" width="3.2" height="10" rx="1.3" fill="currentColor" stroke="none"/><rect x="14.5" y="7" width="3.2" height="10" rx="1.3" fill="currentColor" stroke="none"/><rect x="18.3" y="9.4" width="3.2" height="5.2" rx="1.3" fill="currentColor" stroke="none"/><path d="M9.5 12h5"/></svg><span id="fitLevelChip">Beginner</span></div>
+      </header>
+
+      <div class="seg" id="fitSeg">
+        <button data-diff="Beginner" class="active">Beginner</button>
+        <button data-diff="Intermediate">Intermediate</button>
+        <button data-diff="Advanced">Advanced</button>
+      </div>
+
+      <div class="card big-workout" id="fitHero"></div>
+
+      <div class="sec-head"><h2 class="h2">Your week</h2><span class="meta" id="weekSummary">4 workouts</span></div>
+      <div class="card chart-card">
+        <div class="chart-head">
+          <div><b>Training volume</b><span>Minutes moved per day</span></div>
+          <div class="chart-legend"><div><i style="background:linear-gradient(180deg,#4C8DFF,#2F6BFF)"></i>Done</div><div><i style="background:rgba(255,255,255,.16)"></i>Planned</div></div>
+        </div>
+        <div class="bars" id="weekBars"></div>
+      </div>
+
+      <div class="sec-head"><h2 class="h2">This week's plan</h2><button class="link" data-coach="Adjust my workout plan">Adjust</button></div>
+      <div class="card list-card" id="planList"></div>
+
+      <div class="sec-head"><h2 class="h2">Recovery & mobility</h2></div>
+      <div class="card">
+        <div class="row-between">
+          <div class="study-top" style="gap:11px">
+            <div class="study-ico" style="background:rgba(61,220,151,.1);border-color:rgba(61,220,151,.2);color:#3DDC97">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 21s-7-5.2-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.8-7 10-7 10z"/></svg>
+            </div>
+            <div><b style="font-size:13px">Recovery score: 82%</b><div class="sub" style="font-size:10.5px;margin-top:2px">Sleep 7h 40m · Legs still recovering</div></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub" style="font-size:11.5px;line-height:1.55">Today's recommendation: <b style="color:#fff">10 min hip mobility</b> and keep intensity at 70%. Your next hard session is Thursday.</div>
+        <button class="btn ghost full sm mt14" data-coach="Give me a 10 minute recovery routine">Start recovery routine</button>
+      </div>
+
+      <div class="card" style="background:linear-gradient(150deg,rgba(155,92,255,.1),rgba(255,255,255,.02));border-color:rgba(155,92,255,.18)">
+        <div class="row-between">
+          <div><b style="font-size:12.5px">Not feeling 100%?</b><div class="sub" style="font-size:10.5px;margin-top:3px">I can swap today for a lighter session.</div></div>
+          <button class="btn sm primary" data-coach="I'm sore, give me a lighter workout">Adapt</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SPORTS ============ -->
+    <section class="screen screen-stagger" id="screen-sports">
+      <header class="page-head">
+        <div><div class="eyebrow">Build your edge</div><h1 class="h1">Sports</h1></div>
+        <div class="head-chip"><span class="online"></span>AI plan active</div>
+      </header>
+
+      <p class="sub" style="margin:-6px 2px 12px">Pick your sport. Your practice adapts around school and recovery.</p>
+      <div class="sport-grid" id="sportGrid">
+        <button class="sport-tile" data-sport="Basketball"><em>🏀</em><span>Basketball</span></button>
+        <button class="sport-tile" data-sport="Football"><em>🏈</em><span>Football</span></button>
+        <button class="sport-tile" data-sport="Soccer"><em>⚽</em><span>Soccer</span></button>
+        <button class="sport-tile" data-sport="Baseball"><em>⚾</em><span>Baseball</span></button>
+        <button class="sport-tile" data-sport="Tennis"><em>🎾</em><span>Tennis</span></button>
+        <button class="sport-tile" data-sport="Volleyball"><em>🏐</em><span>Volleyball</span></button>
+        <button class="sport-tile" data-sport="Track"><em>🏃</em><span>Track</span></button>
+        <button class="sport-tile" data-sport="Other"><em>🥇</em><span>Other</span></button>
+      </div>
+
+      <div class="card practice-hero" id="practiceHero"></div>
+
+      <div class="sec-head"><h2 class="h2">Today's drills</h2><span class="meta" id="drillCount">0/4</span></div>
+      <div class="card list-card" id="drillList"></div>
+
+      <div class="sec-head"><h2 class="h2">Training week</h2><span class="meta">3 sessions + 1 game</span></div>
+      <div class="card" id="sportSchedule" style="padding:14px 16px"></div>
+
+      <div class="sec-head"><h2 class="h2">Performance goals</h2></div>
+      <div class="card">
+        <div id="goalList"></div>
+        <div class="radar" id="radarChart"></div>
+        <div class="tiny center" style="margin-top:-8px">Skill profile · updated 2 days ago</div>
+      </div>
+
+      <button class="btn primary full" id="regenPlan" style="margin-top:4px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l1.8 5.6L19.5 9l-5.7 1.4L12 16l-1.8-5.6L4.5 9l5.7-1.4L12 2z"/></svg>
+        Generate a fresh practice plan
+      </button>
+      <div class="onb-hint">Uses your last 7 days of training + school schedule</div>
+    </section>
+
+    <!-- ============ SCHOOL ============ -->
+    <section class="screen screen-stagger" id="screen-school">
+      <header class="page-head">
+        <div><div class="eyebrow">Own your focus</div><h1 class="h1">School</h1></div>
+        <div class="head-chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16v15H4z"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>Spring term</div>
+      </header>
+
+      <div class="card focus-card">
+        <div class="ring tiny" id="focusRing" style="--p:0">
+          <svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="prog" cx="60" cy="60" r="52"/></svg>
+          <div class="ring-label"><b id="focusTime">25:00</b><span>focus</span></div>
+        </div>
+        <div class="focus-copy">
+          <b>Deep focus timer</b>
+          <p id="focusSub">Next: Algebra review · 2 tasks queued</p>
+          <div class="focus-btns">
+            <button class="btn primary sm" id="focusStart">Start</button>
+            <button class="btn ghost sm" id="focusReset">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-head"><h2 class="h2">Assignments</h2><span class="meta" id="assignCount">2 due</span></div>
+      <div class="card list-card" id="assignmentList"></div>
+
+      <div class="sec-head"><h2 class="h2">Today's study plan</h2><button class="link" data-coach="Reschedule my study plan">Replan</button></div>
+      <div class="card" id="studyPlan" style="padding:14px 16px"></div>
+
+      <div class="card" style="background:linear-gradient(150deg,rgba(255,159,69,.08),rgba(255,255,255,.02));border-color:rgba(255,159,69,.16)">
+        <div class="row-between">
+          <div class="study-top" style="gap:11px">
+            <div class="study-ico" style="background:rgba(255,159,69,.1);border-color:rgba(255,159,69,.2);color:#FFC08A">📝</div>
+            <div><b style="font-size:12.5px">Biology test · Friday</b><div class="sub" style="font-size:10px;margin-top:2px">3-day prep plan · 2 quizzes · 18 flashcards</div></div>
+          </div>
+          <button class="btn sm ghost" data-coach="Build me a test prep plan for biology">Prep</button>
+        </div>
+      </div>
+
+      <div class="sec-head"><h2 class="h2">Flashcards</h2><span class="meta">Biology · Cellular energy</span></div>
+      <div class="card">
+        <div class="flashcard" id="flashcard">
+          <div class="fc-inner">
+            <div class="fc-face"><div class="fc-tag">Tap to reveal</div><div class="fc-q" id="fcQuestion">What is the main function of mitochondria?</div></div>
+            <div class="fc-face back"><div class="fc-tag">Answer</div><div class="fc-a" id="fcAnswer">They produce ATP — the energy currency cells use for almost every process.</div></div>
+          </div>
+        </div>
+        <div class="fc-nav">
+          <button class="btn ghost sm" id="fcPrev">← Prev</button>
+          <div class="fc-dots" id="fcDots"></div>
+          <button class="btn ghost sm" id="fcNext">Next →</button>
+        </div>
+        <button class="btn ghost full sm mt10" id="addCardBtn">＋ Create a flashcard</button>
+      </div>
+
+      <div class="sec-head"><h2 class="h2">Quick quiz</h2><span class="meta">AI-generated</span></div>
+      <div class="card" id="quizCard"></div>
+
+      <div class="sec-head"><h2 class="h2">Grades</h2><span class="meta">Term average 88%</span></div>
+      <div class="card">
+        <div id="gradeList"></div>
+        <div class="divider"></div>
+        <div class="row-between"><span class="tiny">Trend vs. last term</span><span class="tiny" style="color:#3DDC97;font-weight:700">↑ 4.2%</span></div>
+      </div>
+    </section>
+
+    <!-- ============ PROFILE ============ -->
+    <section class="screen screen-stagger" id="screen-profile">
+      <header class="page-head" style="margin-bottom:16px">
+        <div><div class="eyebrow">Your journey</div><h1 class="h1">Profile</h1></div>
+        <button class="head-chip" id="editProfile"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Personalize</button>
+      </header>
+
+      <div class="profile-head">
+        <div class="p-avatar"><div class="p-ring"></div><div class="p-inner" id="profileAvatar">A</div></div>
+        <div class="p-info">
+          <h2 id="profileName">Alex Rivera</h2>
+          <div class="p-tag" id="profileTag">Building discipline, one day at a time.</div>
+          <div class="p-loc" id="profileLoc">🎯 Goal: Get stronger · 40 min/day</div>
+        </div>
+      </div>
+
+      <div class="card level-card" style="margin-top:16px">
+        <div class="lc-top"><b>Level <span id="levelNum">7</span> · <span id="levelName">Momentum Builder</span></b><span id="xpToNext">760 XP to next</span></div>
+        <div class="lc-bar"><i id="levelBar" style="width:20%"></i></div>
+        <div class="row-between" style="margin-top:10px"><span class="tiny" id="xpTotal">1,240 XP total</span><span class="tiny" id="xpNextLevel">Level 8</span></div>
+      </div>
+
+      <div class="stats-grid" style="margin-top:14px">
+        <div class="stat-box"><div class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><b id="statXp">1,240</b><span>Total XP earned</span></div>
+        <div class="stat-box p"><div class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2s5 3.5 5 8a5 5 0 0 1-10 0c0-1.5.5-2.7 1-3.6.2 1.4 1 2.3 1.8 2.6C10 7 11 4.6 12 2z"/></svg></div><b id="statStreak">12</b><span>Longest streak · days</span></div>
+        <div class="stat-box g"><div class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2.5" y="9.4" width="3.2" height="5.2" rx="1.3" fill="currentColor" stroke="none"/><rect x="6.3" y="7" width="3.2" height="10" rx="1.3" fill="currentColor" stroke="none"/><rect x="14.5" y="7" width="3.2" height="10" rx="1.3" fill="currentColor" stroke="none"/><rect x="18.3" y="9.4" width="3.2" height="5.2" rx="1.3" fill="currentColor" stroke="none"/><path d="M9.5 12h5"/></svg></div><b id="statWorkouts">24</b><span>Workouts completed</span></div>
+        <div class="stat-box o"><div class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.2 6.6.8-4.9 4.5 1.3 6.5L12 16.8 6.1 20l1.3-6.5L2.5 9l6.6-.8L12 2z"/></svg></div><b id="statBadges">6</b><span>Badges unlocked</span></div>
+      </div>
+
+      <div class="sec-head"><h2 class="h2">Achievements</h2><span class="meta" id="badgeMeta">6 of 12</span></div>
+      <div class="card"><div class="badge-grid" id="badgeGrid"></div></div>
+
+      <div class="sec-head"><h2 class="h2">Active challenges</h2><span class="meta">Resets Monday</span></div>
+      <div class="card" id="challengeList"></div>
+
+      <div class="sec-head"><h2 class="h2">Your personalization</h2><span class="meta">Used by AI</span></div>
+      <div class="card">
+        <div class="tiny" style="margin-bottom:7px">INTERESTS</div>
+        <div class="chips" id="profileTags" style="flex-wrap:wrap;overflow:visible"></div>
+        <div class="divider"></div>
+        <div class="row-between"><span class="tiny">Fitness level</span><span class="pill-tag" id="profileLevel">Beginner</span></div>
+        <div class="row-between" style="margin-top:8px"><span class="tiny">Daily time</span><span class="pill-tag" id="profileTime">40 minutes</span></div>
+        <div class="row-between" style="margin-top:8px"><span class="tiny">Main sports</span><span class="pill-tag" id="profileSports">Basketball</span></div>
+      </div>
+
+      <div class="sec-head"><h2 class="h2">Settings</h2></div>
+      <div class="card">
+        <div class="setting">
+          <div class="s-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/></svg></div>
+          <div class="s-body"><b>Smart reminders</b><span>Adapts to your schedule</span></div>
+          <div class="toggle on" data-toggle></div>
+        </div>
+        <div class="setting">
+          <div class="s-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M5 8h14M5 16h14"/></svg></div>
+          <div class="s-body"><b>Haptic feedback</b><span>Tactile on completions</span></div>
+          <div class="toggle on" data-toggle></div>
+        </div>
+        <div class="setting">
+          <div class="s-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></div>
+          <div class="s-body"><b>Appearance</b><span>Midnight (default)</span></div>
+          <span class="pill-tag">Dark</span>
+        </div>
+        <div class="setting">
+          <div class="s-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4z"/></svg></div>
+          <div class="s-body"><b>Privacy</b><span>Data stays on this device</span></div>
+          <span class="pill-tag">Local</span>
+        </div>
+      </div>
+
+      <button class="btn ghost full" id="restartOnb" style="margin-top:4px">Redo personalization</button>
+      <div class="tiny center" style="margin-top:14px;line-height:1.6">LEVEL UP v1.0 · Built for your next level<br>Consistency over perfection.</div>
+    </section>
+
+  </div>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <button class="nav-item active" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg><span>Home</span></button>
+      <button class="nav-item" data-nav="fitness"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="9.4" width="3.2" height="5.2" rx="1.3" fill="currentColor" stroke="none"/><rect x="6.3" y="7" width="3.2" height="10" rx="1.3" fill="currentColor" stroke="none"/><rect x="14.5" y="7" width="3.2" height="10" rx="1.3" fill="currentColor" stroke="none"/><rect x="18.3" y="9.4" width="3.2" height="5.2" rx="1.3" fill="currentColor" stroke="none"/><path d="M9.5 12h5"/></svg><span>Fitness</span></button>
+      <button class="nav-item" data-nav="sports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3c4 4.2 4 13.8 0 18"/><path d="M3.3 9.6c5.6 2.1 11.8 2.1 17.4 0M3.3 14.4c5.6-2.1 11.8-2.1 17.4 0"/></svg><span>Sports</span></button>
+      <button class="nav-item" data-nav="school"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 12 4l9 4.5-9 4.5-9-4.5z"/><path d="M7 11v5.5c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5V11"/><path d="M21 8.5V15"/></svg><span>School</span></button>
+      <button class="nav-item" data-nav="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg><span>Profile</span></button>
+    </div>
+  </nav>
+
+  <div class="backdrop" id="backdrop"></div>
+  <div class="sheet" id="coachSheet">
+    <div class="sheet-grab"></div>
+    <div class="coach-head">
+      <div class="coach-orb"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.6L19.5 9l-5.7 1.4L12 16l-1.8-5.6L4.5 9l5.7-1.4L12 2z"/><path d="M19 15l.9 2.6L22.5 18l-2.6.9L19 22l-.9-3.1L15.5 18l2.6-.9L19 15z" opacity=".65"/></svg></div>
+      <div><b>Your AI Coach</b><span><i class="online"></i>Knows your schedule, goals & recovery</span></div>
+      <button class="close" id="closeCoach" aria-label="Close"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="coach-scroll" id="coachScroll">
+      <div class="msg ai" id="coachWelcome"></div>
+    </div>
+    <div class="coach-chips" id="coachChips">
+      <button data-coach="Build my plan for today">Plan my day</button>
+      <button data-coach="When should I work out?">Best workout time</button>
+      <button data-coach="Help me get motivated">Motivation</button>
+      <button data-coach="How do I balance school and sports?">Balance</button>
+      <button data-coach="Give me a study tip">Study tip</button>
+      <button data-coach="How's my progress?">My progress</button>
+    </div>
+    <form class="coach-input" id="coachForm" autocomplete="off">
+      <input id="coachInput" type="text" placeholder="Ask your coach anything…" maxlength="220">
+      <button type="submit" aria-label="Send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg></button>
+    </form>
+  </div>
+
+  <div class="player" id="player">
+    <div class="player-top">
+      <span class="ptitle" id="playerPlan">TODAY'S WORKOUT</span>
+      <button class="player-close" id="playerClose" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="player-prog"><i id="playerBar" style="width:0%"></i></div>
+    <div class="player-main">
+      <div class="player-emoji" id="playerEmoji">🏋️</div>
+      <div class="player-set" id="playerSet">EXERCISE 1 OF 5</div>
+      <div class="player-name" id="playerName">Push-Up</div>
+      <div class="player-desc" id="playerDesc">3 sets · 10 reps · Chest, shoulders, triceps</div>
+      <button class="player-guide" id="playerGuide">View form guide →</button>
+      <div class="player-timer">
+        <svg viewBox="0 0 120 120"><circle class="ptrack" cx="60" cy="60" r="52"/><circle class="pfill" id="playerRing" cx="60" cy="60" r="52"/></svg>
+        <div class="pt-label"><b id="playerTime">0:45</b><span>work</span></div>
+      </div>
+    </div>
+    <div class="player-actions">
+      <button class="btn ghost" id="playerPrev">Back</button>
+      <button class="btn primary" id="playerNext">Complete set</button>
+    </div>
+    <div class="player-footnote" id="playerNote">Rest 30s between sets · Breathe steady</div>
+  </div>
+
+  <div class="onb" id="onb">
+    <div class="onb-top">
+      <div class="onb-logo"><span class="mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>LEVEL UP</div>
+      <button class="onb-skip" id="onbSkip">Skip to demo</button>
+    </div>
+    <div class="onb-progress"><i id="onbBar"></i></div>
+    <div class="onb-body" id="onbBody">
+
+      <div class="onb-step splash active" data-step="0">
+        <div class="big-mark"><svg width="42" height="42" viewBox="0 0 24 24" fill="#fff"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
+        <div class="s-brand">LEVEL <span>UP</span></div>
+        <div class="s-tag">Your AI personal coach</div>
+        <p class="s-desc">One place for your habits, training, sport, and school. Built to help you become the best version of yourself.</p>
+        <div class="s-feats"><span>🧠 AI Coach</span><span>💪 Smart training</span><span>🏀 Sport plans</span><span>📚 Study tools</span><span>🔥 XP & streaks</span></div>
+        <div class="s-start-wrap" style="width:100%;margin-top:auto">
+          <button class="btn primary s-start" id="onbStart">Begin your journey
+            <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <div class="onb-hint">Takes 60 seconds · Everything is personalized</div>
+        </div>
+      </div>
+
+      <div class="onb-step" data-step="1">
+        <div class="onb-kicker">Step 1 · About you</div>
+        <div class="onb-title">First, what should<br>I call you?</div>
+        <div class="onb-sub">I'll use this to personalize your dashboard, plans, and coaching.</div>
+        <div class="onb-field">
+          <label>Your name</label>
+          <input class="onb-input" id="onbName" type="text" placeholder="e.g. Alex" maxlength="18" autocomplete="off">
+        </div>
+        <div class="onb-field">
+          <label>Age range</label>
+          <div class="opt-grid two" data-group="age" data-single="1">
+            <button class="opt" data-val="13–15"><span class="o-ico">🌱</span><span class="o-txt"><b>13–15</b><span>Early high school</span></span><span class="o-check">✓</span></button>
+            <button class="opt" data-val="16–18"><span class="o-ico">🚀</span><span class="o-txt"><b>16–18</b><span>Upper high school</span></span><span class="o-check">✓</span></button>
+            <button class="opt" data-val="19–22"><span class="o-ico">🎓</span><span class="o-txt"><b>19–22</b><span>College years</span></span><span class="o-check">✓</span></button>
+            <button class="opt" data-val="23+"><span class="o-ico">⚡</span><span class="o-txt"><b>23+</b><span>Adult life</span></span><span class="o-check">✓</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="onb-step" data-step="2">
+        <div class="onb-kicker">Step 2 · Your focus</div>
+        <div class="onb-title">What do you want<br>to level up?</div>
+        <div class="onb-sub">Pick everything that matters. I'll connect the dots across your whole life.</div>
+        <div class="opt-grid two" data-group="interests" data-max="8">
+          <button class="opt" data-val="Strength"><span class="o-ico">💪</span><span class="o-txt"><b>Strength</b><span>Build power</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Sports"><span class="o-ico">🏆</span><span class="o-txt"><b>Sports</b><span>Play better</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="School"><span class="o-ico">📚</span><span class="o-txt"><b>School</b><span>Better grades</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Discipline"><span class="o-ico">🧭</span><span class="o-txt"><b>Discipline</b><span>Stay consistent</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Mindset"><span class="o-ico">🧠</span><span class="o-txt"><b>Mindset</b><span>Think stronger</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Sleep"><span class="o-ico">🌙</span><span class="o-txt"><b>Sleep</b><span>Recover well</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Nutrition"><span class="o-ico">🥗</span><span class="o-txt"><b>Nutrition</b><span>Fuel right</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Mobility"><span class="o-ico">🧘</span><span class="o-txt"><b>Mobility</b><span>Move freely</span></span><span class="o-check">✓</span></button>
+        </div>
+      </div>
+
+      <div class="onb-step" data-step="3">
+        <div class="onb-kicker">Step 3 · Your game</div>
+        <div class="onb-title">Which sports do<br>you play?</div>
+        <div class="onb-sub">I'll design drills and practice weeks that fit your season and schedule.</div>
+        <div class="opt-grid two" data-group="sports" data-max="3">
+          <button class="opt" data-val="Basketball"><span class="o-ico">🏀</span><span class="o-txt"><b>Basketball</b><span>Court craft</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Football"><span class="o-ico">🏈</span><span class="o-txt"><b>Football</b><span>Power & timing</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Soccer"><span class="o-ico">⚽</span><span class="o-txt"><b>Soccer</b><span>Footwork & stamina</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Baseball"><span class="o-ico">⚾</span><span class="o-txt"><b>Baseball</b><span>Precision & power</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Tennis"><span class="o-ico">🎾</span><span class="o-txt"><b>Tennis</b><span>Agility & focus</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Volleyball"><span class="o-ico">🏐</span><span class="o-txt"><b>Volleyball</b><span>Explosive jumps</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Track"><span class="o-ico">🏃</span><span class="o-txt"><b>Track & field</b><span>Speed & endurance</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Other"><span class="o-ico">🥇</span><span class="o-txt"><b>Other</b><span>Something else</span></span><span class="o-check">✓</span></button>
+        </div>
+      </div>
+
+      <div class="onb-step" data-step="4">
+        <div class="onb-kicker">Step 4 · Training</div>
+        <div class="onb-title">Where are you<br>starting from?</div>
+        <div class="onb-sub">Be honest — the plan adapts as you get stronger. No ego needed.</div>
+        <div class="opt-grid" data-group="experience" data-single="1" style="margin-bottom:14px">
+          <button class="opt" data-val="Beginner"><span class="o-ico">🌱</span><span class="o-txt"><b>Beginner</b><span>New to training, learning the basics</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Intermediate"><span class="o-ico">⚡</span><span class="o-txt"><b>Intermediate</b><span>Training 2–3× a week, know the movements</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Advanced"><span class="o-ico">🔥</span><span class="o-txt"><b>Advanced</b><span>Consistent training, chasing performance</span></span><span class="o-check">✓</span></button>
+        </div>
+        <div class="onb-field" style="margin-bottom:0">
+          <label>Available equipment</label>
+          <div class="opt-grid two" data-group="equipment" data-max="4">
+            <button class="opt" data-val="Bodyweight"><span class="o-ico">🤸</span><span class="o-txt"><b>Bodyweight</b></span><span class="o-check">✓</span></button>
+            <button class="opt" data-val="Dumbbells"><span class="o-ico">🏋️</span><span class="o-txt"><b>Dumbbells</b></span><span class="o-check">✓</span></button>
+            <button class="opt" data-val="Gym"><span class="o-ico">🏟️</span><span class="o-txt"><b>Full gym</b></span><span class="o-check">✓</span></button>
+            <button class="opt" data-val="Bands"><span class="o-ico">🎗️</span><span class="o-txt"><b>Resistance bands</b></span><span class="o-check">✓</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="onb-step" data-step="5">
+        <div class="onb-kicker">Step 5 · School & time</div>
+        <div class="onb-title">How can I support<br>you in school?</div>
+        <div class="onb-sub">This shapes your study blocks, focus sessions, and how I schedule training.</div>
+        <div class="opt-grid two" data-group="schoolGoals" data-max="4" style="margin-bottom:14px">
+          <button class="opt" data-val="Better grades"><span class="o-ico">📈</span><span class="o-txt"><b>Better grades</b></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Homework on time"><span class="o-ico">✅</span><span class="o-txt"><b>On-time homework</b></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Test prep"><span class="o-ico">📝</span><span class="o-txt"><b>Test prep</b></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Focus longer"><span class="o-ico">🎯</span><span class="o-txt"><b>Focus longer</b></span><span class="o-check">✓</span></button>
+        </div>
+        <div class="onb-field" style="margin-bottom:0">
+          <label>Time available per day</label>
+          <div class="opt-grid" data-group="time" data-single="1">
+            <button class="opt" data-val="20 minutes"><span class="o-ico">⏱️</span><span class="o-txt"><b>20 minutes</b><span>Short, focused sessions</span></span><span class="o-check">✓</span></button>
+            <button class="opt" data-val="40 minutes"><span class="o-ico">⏲️</span><span class="o-txt"><b>40 minutes</b><span>A solid daily routine</span></span><span class="o-check">✓</span></button>
+            <button class="opt" data-val="60+ minutes"><span class="o-ico">🕐</span><span class="o-txt"><b>60+ minutes</b><span>Deep training and study</span></span><span class="o-check">✓</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="onb-step" data-step="6">
+        <div class="onb-kicker">Step 6 · Daily habits</div>
+        <div class="onb-title">Which habits should<br>we build first?</div>
+        <div class="onb-sub">I'll start you with a realistic routine — consistency beats intensity.</div>
+        <div class="opt-grid two" data-group="habits" data-max="5">
+          <button class="opt" data-val="Morning routine"><span class="o-ico">🌅</span><span class="o-txt"><b>Morning routine</b><span>Start with intent</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Night routine"><span class="o-ico">🌙</span><span class="o-txt"><b>Night routine</b><span>Wind down well</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Hydration"><span class="o-ico">💧</span><span class="o-txt"><b>Hydration</b><span>8 glasses a day</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Stretch"><span class="o-ico">🧘</span><span class="o-txt"><b>Stretch</b><span>10 min mobility</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Journal"><span class="o-ico">📓</span><span class="o-txt"><b>Journal</b><span>Clear the mind</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Read"><span class="o-ico">📖</span><span class="o-txt"><b>Read</b><span>20 min a day</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Less screen"><span class="o-ico">📵</span><span class="o-txt"><b>Less screen</b><span>Protect attention</span></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Eat well"><span class="o-ico">🥗</span><span class="o-txt"><b>Eat well</b><span>Fuel the work</span></span><span class="o-check">✓</span></button>
+        </div>
+      </div>
+
+      <div class="onb-step" data-step="7">
+        <div class="onb-kicker">Final step · Your why</div>
+        <div class="onb-title">What's the #1 thing<br>you want?</div>
+        <div class="onb-sub">Your AI coach will anchor every plan to this goal.</div>
+        <div class="opt-grid two" data-group="goal" data-single="1">
+          <button class="opt" data-val="Get stronger"><span class="o-ico">💪</span><span class="o-txt"><b>Get stronger</b></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Build discipline"><span class="o-ico">🧭</span><span class="o-txt"><b>Build discipline</b></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Excel in my sport"><span class="o-ico">🏆</span><span class="o-txt"><b>Excel in my sport</b></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Better grades"><span class="o-ico">📚</span><span class="o-txt"><b>Better grades</b></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="Feel healthier"><span class="o-ico">🌿</span><span class="o-txt"><b>Feel healthier</b></span><span class="o-check">✓</span></button>
+          <button class="opt" data-val="All of it"><span class="o-ico">⚡</span><span class="o-txt"><b>All of it</b></span><span class="o-check">✓</span></button>
+        </div>
+        <div class="card flat" style="margin-top:16px;background:rgba(76,141,255,.06);border-color:rgba(76,141,255,.16)">
+          <div class="row-between"><span class="tiny">AI READINESS</span><span class="tiny" style="color:#8FE9D6;font-weight:700">Ready to build</span></div>
+          <div class="divider" style="margin:10px 0"></div>
+          <div id="onbSummary" class="sub" style="font-size:11px;line-height:1.7">Your plan will blend training, school, and recovery.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="onb-foot" id="onbFoot" style="display:none">
+      <button class="btn primary full" id="onbNext">Continue
+        <svg class="arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+      <div class="onb-hint" id="onbHint">You can change everything later in Profile</div>
+    </div>
+  </div>
+
+  <div class="mini-backdrop" id="miniBackdrop"></div>
+  <div class="mini-sheet" id="miniSheet">
+    <div class="sheet-grab"></div>
+    <div class="mini-head"><b id="miniTitle">Create</b><button class="mini-close" id="miniClose" aria-label="Close">×</button></div>
+    <div id="miniContent"></div>
+  </div>
+
+  <div class="toast" id="toast"><span class="tspark">✦</span><span id="toastMsg">Nice work</span></div>
+  <div class="confetti-layer" id="confettiLayer"></div>
+</div>
+
+<script src="/account.js" defer></script>
+</body>
+</html>
