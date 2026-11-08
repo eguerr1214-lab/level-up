@@ -1079,19 +1079,44 @@ function renderFitness(){
       <div class="bar-track"><div class="bar-fill ${m === 0 ? 'zero' : ''}" style="height:${Math.max(4, Math.round(m / max * 100))}%"></div></div>
       <span>${DAYS_SHORT[i]}</span>
     </div>`).join('');
-  $('#weekSummary').textContent = `${state.weekMinutes.filter(m => m > 0).length} active days`;
+  $('#weekSummary').textContent = `${workoutsThisWeek().length} workouts · ${weekMinutesTotal()} min`;
 
-  const plan = WEEK_PLAN[state.difficulty] || WEEK_PLAN.Beginner;
-  $('#planList').innerHTML = plan.map((name, i) => {
+  const sched = state.workoutSchedule;
+  $('#planList').innerHTML = sched.map((s, i) => {
     const isToday = i === mondayIndex;
-    const done = i < mondayIndex || (isToday && state.tasksDone.workout);
-    const label = isToday ? (state.tasksDone.workout ? 'Completed today' : 'Today · 5:30 PM') : done ? 'Completed' : 'Planned · 5:30 PM';
+    const logged = isToday && !!state.tasksDone.workout;
+    const rest = !s.minutes;
     return `<div class="task" style="cursor:default">
-      <div class="check" style="${done ? 'background:var(--grad);border-color:transparent;color:#fff' : ''}">${svgCheck()}</div>
-      <div class="t-body"><div class="t-label" style="${done && !isToday ? 'color:var(--muted2)' : ''}">${esc(i === mondayIndex ? w.name : name)}</div><div class="t-sub">${label}${isToday ? ' · <span class="tag">TODAY</span>' : ''}</div></div>
-      <span class="tiny" style="color:var(--muted2)">${i === mondayIndex ? w.dur : 30} min</span>
+      <div class="check" style="${logged ? 'background:var(--grad);border-color:transparent;color:#fff' : ''}">${svgCheck()}</div>
+      <div class="t-body">
+        <div class="t-label" style="${logged ? 'color:var(--muted2)' : ''}">${esc(isToday ? w.name : s.title)}</div>
+        <div class="t-sub">${logged ? 'Logged today' : rest ? 'Rest · recovery only' : `${s.minutes} min · planned`}${isToday ? ' · <span class="tag">TODAY</span>' : ''}</div>
+      </div>
+      <button class="icon-btn sm" data-schedule-edit="${i}" aria-label="Edit ${esc(s.title)}">✎</button>
+      ${isToday && !logged && !rest ? `<button class="btn ghost sm" data-log-workout="${i}">Log</button>` : ''}
     </div>`;
   }).join('');
+
+  renderFitnessHistory();
+}
+
+function renderFitnessHistory(){
+  const el = $('#fitHistory');
+  if (!el) return;
+  const hist = (state.workoutHistory || []).slice(0, 6);
+  el.innerHTML = hist.length ? hist.map(w => `
+    <div class="hist-row">
+      <div class="hist-ico">💪</div>
+      <div class="t-body">
+        <div class="t-label">${esc(w.title)}</div>
+        <div class="t-sub">${esc(dateFromKey(w.day).toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' }))} · ${w.minutes} min</div>
+      </div>
+      <span class="xp-badge">✓</span>
+    </div>`).join('') : `<div class="empty-note">No workouts recorded yet. Finish a session and it shows up here.</div>`;
+  const total = (state.workoutHistory || []).length;
+  const mins = (state.workoutHistory || []).reduce((s, w) => s + (w.minutes || 0), 0);
+  const sum = $('#fitHistoryMeta');
+  if (sum) sum.textContent = `${total} logged · ${fmt(mins)} min`;
 }
 
 function renderSports(){
