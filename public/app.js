@@ -3,7 +3,7 @@
    ============================================================ */
 const $  = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
-const STORAGE_KEY = 'levelup_state_v1';
+const STORAGE_KEY = window.LEVELUP_STORAGE_KEY || 'levelup_state_v1';
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const DAYS_SHORT = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -207,14 +207,19 @@ function defaultState(){
 
 let state = loadState();
 function loadState(){
+  const fresh = () => {
+    const s = defaultState();
+    if (window.LEVELUP_USER && window.LEVELUP_USER.name) s.name = window.LEVELUP_USER.name;
+    return s;
+  };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultState();
+    if (!raw) return fresh();
     const saved = JSON.parse(raw);
     const merged = Object.assign(defaultState(), saved);
     merged.assignments = Array.isArray(saved.assignments) ? saved.assignments : defaultAssignments();
     return merged;
-  } catch(e){ return defaultState(); }
+  } catch(e){ return fresh(); }
 }
 function saveState(){
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){}
@@ -725,7 +730,8 @@ function svgBolt(){ return '<svg width="12" height="12" viewBox="0 0 24 24" fill
    ============================================================ */
 function showScreen(name){
   $$('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + name));
-  $$('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.nav === name));
+  const navKey = name === 'billing' ? 'profile' : name;
+  $$('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.nav === navKey));
   const sc = $('#screens');
   if (sc) sc.scrollTop = 0;
   if (name === 'profile') renderProfile();
@@ -1346,6 +1352,8 @@ $('#regenPlan').addEventListener('click', () => {
   toast('Fresh 7-day plan generated around school', '✨');
   confetti();
 });
+
+window.showScreen = showScreen;
 
 /* boot */
 tickClock();
