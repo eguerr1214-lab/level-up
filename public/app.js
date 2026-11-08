@@ -278,42 +278,6 @@ function defaultState(){
   };
 }
 
-function defaultState(){
-  return {
-    v: 1,
-    onboarded: false,
-    name: 'Alex',
-    age: '16–18',
-    interests: ['Strength','Sports','School','Discipline'],
-    sports: ['Basketball'],
-    experience: 'Beginner',
-    equipment: ['Bodyweight','Dumbbells'],
-    schoolGoals: ['Better grades','Homework on time'],
-    time: '40 minutes',
-    habits: ['Morning routine','Hydration','Stretch','Night routine'],
-    goal: 'Get stronger',
-    xp: 1240,
-    streak: 12,
-    water: 3,
-    waterGoal: 8,
-    difficulty: 'Beginner',
-    sport: 'Basketball',
-    tasksDone: {},
-    habitsDone: {},
-    habitIcons: {},
-    habitReminders: {},
-    customCards: [],
-    drillsDone: {},
-    quizIndex: 0,
-    quizAnswer: null,
-    quizAwarded: {},
-    dayCelebrated: false,
-    fcIndex: 0,
-    assignments: defaultAssignments(),
-    weekMinutes: [38, 52, 0, 64, 45, 72, 30],
-    settings: { reminders: true, haptics: true, accent: 'midnight' }
-  };
-}
 
 let state = loadState();
 function loadState(){
