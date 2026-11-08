@@ -1297,24 +1297,29 @@ function renderProfile(){
   $('#xpTotal').textContent = `${fmt(totalXp())} XP total`;
   $('#xpNextLevel').textContent = `Level ${li.level + 1}`;
   $('#statXp').textContent = fmt(totalXp());
-  $('#statStreak').textContent = state.streak;
-  $('#statWorkouts').textContent = 24 + (state.tasksDone.workout ? 1 : 0);
-  $('#statBadges').textContent = BADGES.filter(b => b.earned).length;
+  $('#statStreak').textContent = currentStreak();
+  $('#statWorkouts').textContent = (state.workoutHistory || []).length;
 
-  $('#badgeGrid').innerHTML = BADGES.map(b => `
-    <div class="badge ${b.earned ? 'earned' : 'locked'}">
+  const list = achievementsView();
+  const earned = list.filter(a => a.earned).length;
+  $('#statBadges').textContent = earned;
+
+  $('#badgeGrid').innerHTML = list.map(b => `
+    <div class="badge ${b.earned ? 'earned' : 'locked'}" title="${esc(b.desc)}">
       <span class="b-ico">${b.icon}</span><span>${b.name}</span>
+      ${b.earned ? '' : `<div class="b-track"><i style="width:${b.pct}%"></i></div>`}
     </div>`).join('');
-  $('#badgeMeta').textContent = `${BADGES.filter(b => b.earned).length} of ${BADGES.length}`;
+  $('#badgeMeta').textContent = `${earned} of ${list.length}`;
 
-  $('#challengeList').innerHTML = CHALLENGES.map(c => `
+  const next = list.filter(b => !b.earned).sort((a, b) => b.pct - a.pct).slice(0, 3);
+  $('#challengeList').innerHTML = next.length ? next.map(c => `
     <div class="challenge">
       <div class="ch-ico">${c.icon}</div>
-      <div class="ch-body"><b>${c.name}</b><div class="tiny" style="margin-top:2px">${c.detail}</div>
+      <div class="ch-body"><b>${esc(c.name)}</b><div class="tiny" style="margin-top:2px">${esc(c.desc)} · ${c.value}/${c.goal}</div>
         <div class="ch-bar"><i style="width:${c.pct}%"></i></div>
       </div>
-      <span class="ch-xp">+${c.xp} XP</span>
-    </div>`).join('');
+      <span class="ch-xp">${c.pct}%</span>
+    </div>`).join('') : `<div class="empty-note">Every achievement unlocked. Legend. 👑</div>`;
 
   $('#profileTags').innerHTML = (state.interests.length ? state.interests : ['Strength','Discipline'])
     .map(t => `<span class="chip active">${esc(t)}</span>`).join('');
