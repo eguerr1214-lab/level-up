@@ -1066,7 +1066,10 @@ function renderFitness(){
         <div>${svgLayers()} ${esc(w.list)}</div>
         <div>${svgBolt()} ${state.difficulty}</div>
       </div>
-      <button class="btn primary full sm mt14" onclick="openPlayer()">${state.tasksDone.workout ? 'Do it again' : 'Start workout'} <span class="arrow">→</span></button>
+      <div class="btn-row mt14">
+        <button class="btn primary sm" onclick="openPlayer()">${state.tasksDone.workout ? 'Do it again' : 'Start workout'} <span class="arrow">→</span></button>
+        <button class="btn ghost sm" data-exercise-library>Exercise library</button>
+      </div>
     </div>`;
 
   const { mondayIndex } = nowParts();
