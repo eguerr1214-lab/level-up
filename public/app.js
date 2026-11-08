@@ -864,6 +864,7 @@ function renderProfile(){
   $('#profileLevel').textContent = state.experience;
   $('#profileTime').textContent = state.time;
   $('#profileSports').textContent = state.sports.length ? state.sports.join(', ') : sportName();
+  syncSettingsUI();
 }
 
 function renderAll(){
