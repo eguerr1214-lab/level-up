@@ -1679,11 +1679,13 @@ function syncOnbFromState(){
 }
 function showOnb(step){
   onbStep = step;
+  $('#onb').setAttribute('aria-hidden', 'false');
   $('#onb').style.display = 'flex';
   requestAnimationFrame(() => { $('#onb').classList.remove('hidden'); $('#onb').classList.remove('closing'); });
   updateOnb();
 }
 function hideOnb(){
+  $('#onb').setAttribute('aria-hidden', 'true');
   $('#onb').classList.add('closing');
   setTimeout(() => { $('#onb').style.display = 'none'; }, 600);
 }
