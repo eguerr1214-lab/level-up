@@ -224,6 +224,7 @@ function loadState(){
     const saved = JSON.parse(raw);
     const merged = Object.assign(defaultState(), saved);
     merged.assignments = Array.isArray(saved.assignments) ? saved.assignments : defaultAssignments();
+    merged.settings = Object.assign({ reminders: true, haptics: true, accent: 'midnight' }, saved.settings || {});
     return merged;
   } catch(e){ return fresh(); }
 }
