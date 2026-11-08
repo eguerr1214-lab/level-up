@@ -130,20 +130,24 @@ const QUIZ = [
   { q:'Where does the Krebs cycle take place?', opts:['Cytoplasm','Mitochondrial matrix','Cell membrane','Nucleus'], answer:1, why:'The Krebs cycle runs in the mitochondrial matrix, feeding NADH into the ETC.' }
 ];
 
-const BADGES = [
-  { icon:'🌱', name:'First Step', earned:true }, { icon:'🔥', name:'7-Day Streak', earned:true },
-  { icon:'💧', name:'Hydrated', earned:true }, { icon:'🌅', name:'Early Bird', earned:true },
-  { icon:'🎯', name:'Focused', earned:true }, { icon:'💪', name:'Strong Start', earned:true },
-  { icon:'🏆', name:'30-Day Streak', earned:false }, { icon:'💯', name:'Century Club', earned:false },
-  { icon:'⚙️', name:'Iron Will', earned:false }, { icon:'🎓', name:'Scholar', earned:false },
-  { icon:'🏅', name:'Athlete', earned:false }, { icon:'👑', name:'Level 10', earned:false }
+/* Achievements are computed from stored activity — nothing is pre-marked as earned. */
+const ACHIEVEMENTS = [
+  { id:'first-step', icon:'🌱', name:'First Step', desc:'Complete your first activity', goal:1, value:() => totalActivityCount() },
+  { id:'habit-builder', icon:'🌅', name:'Habit Builder', desc:'Complete 5 habits', goal:5, value:() => countLedger('habit:') },
+  { id:'streak-3', icon:'🔥', name:'Warm Streak', desc:'Stay active 3 days in a row', goal:3, value:() => longestStreak() },
+  { id:'streak-7', icon:'🏆', name:'7-Day Streak', desc:'Stay active 7 days in a row', goal:7, value:() => longestStreak() },
+  { id:'hydrated', icon:'💧', name:'Hydrated', desc:'Hit your water goal 7 times', goal:7, value:() => countLedger('water:') },
+  { id:'focused', icon:'🎯', name:'Focused', desc:'Finish 3 focus sessions', goal:3, value:() => countLedger('focus:') },
+  { id:'strong-start', icon:'💪', name:'Strong Start', desc:'Record your first workout', goal:1, value:() => (state.workoutHistory || []).length },
+  { id:'iron-will', icon:'⚙️', name:'Iron Will', desc:'Record 10 workouts', goal:10, value:() => (state.workoutHistory || []).length },
+  { id:'scholar', icon:'🎓', name:'Scholar', desc:'Complete 5 assignments', goal:5, value:() => countLedger('assignment:') },
+  { id:'athlete', icon:'🏅', name:'Athlete', desc:'Complete 10 sport drills', goal:10, value:() => countLedger('drill:') },
+  { id:'century', icon:'💯', name:'Century Club', desc:'Earn 1,000 XP', goal:1000, value:() => totalXp() },
+  { id:'level-10', icon:'👑', name:'Level 10', desc:'Reach level 10', goal:10, value:() => levelInfo(totalXp()).level }
 ];
 
-const CHALLENGES = [
-  { icon:'🔥', name:'Move 5 days this week', detail:'4 of 5 days complete', pct:80, xp:120 },
-  { icon:'📚', name:'Complete 10 study blocks', detail:'7 of 10 blocks', pct:70, xp:80 },
-  { icon:'💧', name:'Hydrate 7 days in a row', detail:'5 of 7 days', pct:71, xp:60 }
-];
+const HABIT_ICONS = ['🌅','🌙','💧','🧘','📓','📖','📵','🥗','🏃','🧠'];
+const SUBJECT_COLORS = ['#4C8DFF','#3DDC97','#FF9F45','#FF5C8A','#9B5CFF','#38E0CE','#FFD166'];
 
 const QUOTES = [
   ['Small steps, repeated daily, become the identity you\'re building.', 'LEVEL UP · DAILY REMINDER'],
