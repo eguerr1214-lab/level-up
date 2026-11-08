@@ -520,7 +520,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found.' }));
 
-app.get('*', (req, res) => {
+app.get('/*splat', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
