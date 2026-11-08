@@ -424,7 +424,72 @@ function nowParts(){
 }
 function firstName(){ return (state.name || 'Champion').trim().split(' ')[0]; }
 function initial(){ return (firstName()[0] || 'A').toUpperCase(); }
-function totalXp(){ return Math.max(0, state.xp); }
+function ledgerSum(){
+  const l = state.xpLedger || {};
+  return Object.keys(l).reduce((sum, k) => sum + (Number(l[k]) || 0), 0);
+}
+function totalXp(){ return Math.max(0, (Number(state.xpBase) || 0) + ledgerSum()); }
+function countLedger(prefix){
+  return Object.keys(state.xpLedger || {}).filter(k => k.startsWith(prefix) && state.xpLedger[k] > 0).length;
+}
+function markActive(key = todayKey()){ state.activeDays[key] = true; }
+function longestStreak(){
+  const days = Object.keys(state.activeDays || {}).sort();
+  let best = 0, run = 0, prev = null;
+  days.forEach(day => {
+    run = prev && shiftKey(prev, 1) === day ? run + 1 : 1;
+    best = Math.max(best, run);
+    prev = day;
+  });
+  return best;
+}
+function currentStreak(){
+  let key = todayKey(), streak = 0;
+  if (!state.activeDays[key]) key = shiftKey(key, -1);
+  while (state.activeDays[key]) { streak++; key = shiftKey(key, -1); }
+  return streak;
+}
+function totalActivityCount(){ return countLedger('') ; }
+function achievementsView(){
+  return ACHIEVEMENTS.map(a => {
+    const value = a.value();
+    const earned = value >= a.goal;
+    return { ...a, value, earned, pct: Math.min(100, Math.round(value / a.goal * 100)) };
+  });
+}
+function checkAchievements(){
+  const unlocked = [];
+  achievementsView().forEach(a => {
+    if (a.earned && !state.achievements[a.id]) { state.achievements[a.id] = todayKey(); unlocked.push(a); }
+  });
+  return unlocked;
+}
+function announceAchievements(list){
+  if (!list.length) return;
+  setTimeout(() => { toast(`Achievement unlocked — ${list[0].name}!`, list[0].icon); confetti(); }, 420);
+}
+/* Awards XP exactly once per activity key. Returns false when it was already paid. */
+function awardXp(key, amount, label, icon = '✦', opts = {}){
+  if (!key) return false;
+  state.xpLedger = state.xpLedger || {};
+  if (state.xpLedger[key]) return false;
+  const before = levelInfo(totalXp()).level;
+  state.xpLedger[key] = amount;
+  markActive();
+  const after = levelInfo(totalXp()).level;
+  if (!opts.silent) toast(`+${amount} XP${label ? ' · ' + label : ''}`, icon);
+  if (!opts.silent) haptic();
+  if (after > before) {
+    setTimeout(() => { toast(`Level ${after} unlocked — ${levelInfo(totalXp()).name}!`, '👑'); confetti(); }, 350);
+  }
+  announceAchievements(checkAchievements());
+  return true;
+}
+/* Reverses a single award when the user un-completes something. */
+function revokeXp(key){
+  if (state.xpLedger && state.xpLedger[key] != null) delete state.xpLedger[key];
+}
+
 function levelInfo(xp){
   const level = Math.floor(xp / 200) + 1;
   const into = xp % 200;
