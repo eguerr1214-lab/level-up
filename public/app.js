@@ -1864,9 +1864,9 @@ function openHabitSheet(id){
     <input class="mini-input" id="miniReminder" maxlength="24" value="${habit && habit.reminder ? esc(habit.reminder) : ''}" placeholder="e.g. 7:30 AM — before school" autocomplete="off">
     <button class="btn primary mini-save" id="miniSaveHabit">${habit ? 'Save changes' : 'Add habit'}</button>
     ${habit ? '<button class="btn ghost full sm mt8" id="miniDeleteHabit">Delete habit</button>' : ''}`;
-  $('#miniEmojiPick button').forEach(b => b.addEventListener('click', () => {
+  $$('#miniEmojiPick button').forEach(b => b.addEventListener('click', () => {
     miniEmoji = b.dataset.emoji;
-    $('#miniEmojiPick button').forEach(x => x.classList.toggle('active', x === b));
+    $$('#miniEmojiPick button').forEach(x => x.classList.toggle('active', x === b));
   }));
   $('#miniSaveHabit').addEventListener('click', saveHabitSheet);
   const del = $('#miniDeleteHabit');
