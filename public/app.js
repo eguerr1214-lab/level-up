@@ -336,7 +336,8 @@ function migrateState(saved, base, isAccount){
   s.sportSchedules = Object.assign({}, saved.sportSchedules || {});
   s.sportGoals = Object.assign({}, saved.sportGoals || {});
   s.workoutHistory = Array.isArray(saved.workoutHistory) ? saved.workoutHistory : [];
-  s.grades = Array.isArray(saved.grades) ? saved.grades : defaultGrades();
+  // Sample study content is only ever seeded in demo mode, never in an account.
+  s.grades = Array.isArray(saved.grades) ? saved.grades : (s.demo ? defaultGrades() : []);
   s.customCards = Array.isArray(saved.customCards) ? saved.customCards : [];
   s.settings = Object.assign({ reminders: true, haptics: true, accent: 'midnight' }, saved.settings || {});
 
