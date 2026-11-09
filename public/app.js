@@ -235,11 +235,13 @@ function defaultSportGoals(sport){
   return sp.goals.map((g, i) => ({ id:`sg_${sport.toLowerCase()}_${i}`, name:g.n, value:g.v, target:100, unit:'%', legacyLabel:g.label }));
 }
 
-function defaultState(){
+function defaultState(isDemo){
+  const demo = !!isDemo;
   return {
     v: 2,
+    demo,
     onboarded: false,
-    name: 'Alex',
+    name: demo ? 'Guest' : '',
     age: '16–18',
     interests: ['Strength','Sports','School','Discipline'],
     sports: ['Basketball'],
@@ -252,7 +254,7 @@ function defaultState(){
     xpLedger: {},
     activeDays: {},
     achievements: {},
-    habits: defaultHabits(),
+    habits: demo ? defaultHabits() : [],
     habitLog: {},
     tasksDone: {},
     tasksDay: todayKey(),
@@ -265,8 +267,8 @@ function defaultState(){
     quizIndex: 0,
     quizAnswer: null,
     dayCelebrated: false,
-    assignments: defaultAssignments(),
-    grades: defaultGrades(),
+    assignments: demo ? defaultAssignments() : [],
+    grades: demo ? defaultGrades() : [],
     workoutHistory: [],
     workoutSchedule: defaultWorkoutSchedule('Beginner'),
     scheduleCustom: false,
@@ -282,7 +284,7 @@ function defaultState(){
 let state = loadState();
 function loadState(){
   const fresh = () => {
-    const s = defaultState();
+    const s = defaultState(!window.LEVELUP_USER);
     if (window.LEVELUP_USER) {
       // A signed-in account already has an identity, so skip the intro wizard.
       // Personalization stays available from Profile → "Redo personalization".
@@ -2215,4 +2217,13 @@ if (state.onboarded) {
   $('#onb').style.display = 'none';
 } else {
   showOnb(0);
+}
+
+/* Demo mode: sample content is clearly labelled, never presented as the user's own data. */
+if (!window.LEVELUP_USER) {
+  const demoNote = document.createElement('div');
+  demoNote.className = 'demo-banner';
+  demoNote.setAttribute('role', 'status');
+  demoNote.textContent = 'Demo mode · sample data for exploring — create an account to save your own progress';
+  document.body.appendChild(demoNote);
 }
