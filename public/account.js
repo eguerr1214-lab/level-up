@@ -294,7 +294,6 @@
     const plan = user ? plans.find((p) => p.id === user.plan) : null;
     $('#curPlanName').textContent = plan ? plan.name : user ? 'Starter' : 'Demo';
     $('#curPlanBadge').textContent = plan ? plan.tag : 'GUEST';
-    <div class="plan-testmode">Test mode · no real payment is processed and billing is not connected to a payment provider yet.</div>
     $('#curPlanSub').textContent = !user
       ? 'You are exploring the demo. Create an account to keep your plan.'
       : plan && plan.id === 'free'
