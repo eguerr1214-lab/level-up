@@ -174,6 +174,7 @@
   $('#authDemo').addEventListener('click', () => {
     user = null;
     window.LEVELUP_USER = null;
+    window.LEVELUP_DEMO = true;
     window.LEVELUP_STORAGE_KEY = 'levelup_state_v1:guest';
     hideGate();
     renderAccount();
@@ -293,6 +294,7 @@
     const plan = user ? plans.find((p) => p.id === user.plan) : null;
     $('#curPlanName').textContent = plan ? plan.name : user ? 'Starter' : 'Demo';
     $('#curPlanBadge').textContent = plan ? plan.tag : 'GUEST';
+    <div class="plan-testmode">Test mode · no real payment is processed and billing is not connected to a payment provider yet.</div>
     $('#curPlanSub').textContent = !user
       ? 'You are exploring the demo. Create an account to keep your plan.'
       : plan && plan.id === 'free'
@@ -422,10 +424,11 @@
         </div>
         <div class="divider"></div>
         <form id="checkoutForm" novalidate>
+          <div class="plan-testmode">Test mode · this form does not charge a card or contact a payment provider.</div>
           <label class="mini-label" for="cardNumber">Card number</label>
-          <input class="mini-input" id="cardNumber" inputmode="numeric" autocomplete="cc-number" placeholder="4242 4242 4242 4242" maxlength="23" required>
+          <input class="mini-input" id="cardNumber" inputmode="numeric" autocomplete="cc-number" placeholder="Card number" maxlength="23" required>
           <label class="mini-label" for="cardName">Name on card</label>
-          <input class="mini-input" id="cardName" autocomplete="cc-name" placeholder="${escapeHtml(user ? user.name : 'Alex Rivera')}" maxlength="60" required>
+          <input class="mini-input" id="cardName" autocomplete="cc-name" placeholder="${escapeHtml(user ? user.name : 'Name on card')}" maxlength="60" required>
           <div class="checkout-split">
             <div>
               <label class="mini-label" for="cardExp">Expiry</label>
