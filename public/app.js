@@ -352,9 +352,10 @@ function migrateState(saved, base, isAccount){
   delete s.habitReminders;
   delete s.quizAwarded;
 
-  // v1 habits were plain strings.
+  // v1 habits were plain strings. Sample habits are seeded in demo mode only:
+  // an account that deleted its habits must stay empty, not get them back.
   if (!Array.isArray(saved.habits) || !saved.habits.length) {
-    s.habits = defaultHabits();
+    s.habits = s.demo ? defaultHabits() : [];
   } else if (typeof saved.habits[0] === 'string') {
     const icons = saved.habitIcons || {}, reminders = saved.habitReminders || {};
     s.habits = saved.habits.map((name, i) => ({
