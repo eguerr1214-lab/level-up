@@ -3,7 +3,12 @@
    ============================================================ */
 const $  = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
-const STORAGE_KEY = window.LEVELUP_STORAGE_KEY || 'levelup_state_v1';
+/* Every save is scoped to an account (or to an explicit demo session). The bare
+   legacy key 'levelup_state_v1' held the original demo profile and must never be
+   read again, so the fallback is the guest scope instead. */
+const STORAGE_KEY = window.LEVELUP_STORAGE_KEY || 'levelup_state_v1:guest';
+const LEGACY_KEYS = ['levelup_state_v1'];
+const IS_DEMO = !!window.LEVELUP_DEMO && !window.LEVELUP_USER;
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const DAYS_SHORT = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
