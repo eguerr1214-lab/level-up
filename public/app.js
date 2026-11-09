@@ -286,6 +286,15 @@ function defaultState(isDemo){
 }
 
 
+/* The original demo build shipped one sample profile. Any save carrying that
+   signature is demo data, never a real account's progress. */
+function isLegacyDemoState(sv){
+  if (!sv || typeof sv !== 'object') return false;
+  if (sv.demo === true) return true;
+  if (typeof sv.name === 'string' && /^\s*alex\s+rivera\s*$/i.test(sv.name)) return true;
+  return false;
+}
+
 let state = loadState();
 function loadState(){
   // The original demo build saved one unscoped profile (a sample name, 1,240 XP
@@ -310,7 +319,7 @@ function loadState(){
     if (!raw) return fresh();
     const saved = JSON.parse(raw) || {};
     // A demo profile must never be promoted into a real account.
-    if (window.LEVELUP_USER && saved.demo) return fresh();
+    if (window.LEVELUP_USER && isLegacyDemoState(saved)) return fresh();
     return migrateState(saved, fresh(), !!window.LEVELUP_USER);
   } catch(e){ return fresh(); }
 }
@@ -365,7 +374,7 @@ function migrateState(saved, base, isAccount){
   }
 
   // v1 assignments stored display strings ("Tomorrow"); convert to real dates.
-  s.assignments = (Array.isArray(saved.assignments) ? saved.assignments : defaultAssignments()).map(a => {
+  s.assignments = (Array.isArray(saved.assignments) ? saved.assignments : (s.demo ? defaultAssignments() : [])).map(a => {
     const dueMap = { tomorrow: 1, monday: 6, tuesday: 5, wednesday: 4, thursday: 3, friday: 2 };
     let due = a.due;
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(due))) {
@@ -2244,7 +2253,7 @@ if (state.onboarded) {
 }
 
 /* Demo mode: sample content is clearly labelled, never presented as the user's own data. */
-if (!window.LEVELUP_USER) {
+if (IS_DEMO) {
   const demoNote = document.createElement('div');
   demoNote.className = 'demo-banner';
   demoNote.setAttribute('role', 'status');
