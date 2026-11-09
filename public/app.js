@@ -288,8 +288,15 @@ function defaultState(isDemo){
 
 let state = loadState();
 function loadState(){
+  // The original demo build saved one unscoped profile (a sample name, 1,240 XP
+  // and a 12-day streak) under the bare key. Delete it on every load so no
+  // account can ever inherit that sample data again.
+  try {
+    LEGACY_KEYS.forEach(k => { if (k !== STORAGE_KEY) localStorage.removeItem(k); });
+  } catch(e){}
+
   const fresh = () => {
-    const s = defaultState(!window.LEVELUP_USER);
+    const s = defaultState(IS_DEMO);
     if (window.LEVELUP_USER) {
       // A signed-in account already has an identity, so skip the intro wizard.
       // Personalization stays available from Profile → "Redo personalization".
@@ -302,7 +309,9 @@ function loadState(){
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return fresh();
     const saved = JSON.parse(raw) || {};
-    return migrateState(saved, fresh());
+    // A demo profile must never be promoted into a real account.
+    if (window.LEVELUP_USER && saved.demo) return fresh();
+    return migrateState(saved, fresh(), !!window.LEVELUP_USER);
   } catch(e){ return fresh(); }
 }
 
