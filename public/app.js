@@ -315,10 +315,18 @@ function loadState(){
   } catch(e){ return fresh(); }
 }
 
-/* Upgrade any earlier save into the v2 shape without dropping user data. */
-function migrateState(saved, base){
+/* Upgrade any earlier save into the v2 shape without dropping user data.
+   `isAccount` means the save belongs to a signed-in user: sample collections are
+   never re-seeded for accounts, and identity always comes from the session. */
+function migrateState(saved, base, isAccount){
   const s = Object.assign(base, saved);
   s.v = 2;
+  if (isAccount) {
+    // The account is the single source of truth for identity.
+    s.demo = false;
+    if (window.LEVELUP_USER.name) s.name = window.LEVELUP_USER.name;
+    s.onboarded = true;
+  }
   s.xpLedger = Object.assign({}, saved.xpLedger || {});
   s.activeDays = Object.assign({}, saved.activeDays || {});
   s.achievements = Object.assign({}, saved.achievements || {});
