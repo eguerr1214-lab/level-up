@@ -329,7 +329,14 @@ app.use((req, res, next) => {
   return next();
 });
 
-app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'], maxAge: IS_PROD ? '1h' : 0 }));
+app.use(express.static(path.join(__dirname, 'public'), {
+  extensions: ['html'],
+  maxAge: IS_PROD ? '1h' : 0,
+  // HTML must revalidate so a fix is never hidden behind an hour-old page.
+  setHeaders(res, filePath) {
+    if (/\.html$/i.test(filePath)) res.setHeader('Cache-Control', 'no-cache');
+  }
+}));
 
 /* ---------- auth API ---------- */
 app.post('/api/auth/register', rateLimit, (req, res) => {
