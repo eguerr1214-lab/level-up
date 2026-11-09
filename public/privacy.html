@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy · LEVEL UP</title>
+<style>
+  :root{--bg:#05070f;--card:#0d1224;--line:rgba(120,150,255,.16);--txt:#e8ecff;--dim:#9aa6c8;--blue:#4C8DFF;--purple:#8B5CF6}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,rgba(139,92,246,.18),transparent 60%),radial-gradient(900px 500px at 10% 0%,rgba(76,141,255,.16),transparent 55%),var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;line-height:1.65}
+  .wrap{max-width:760px;margin:0 auto;padding:28px 20px 64px}
+  .back{display:inline-flex;align-items:center;gap:8px;color:var(--dim);text-decoration:none;font-size:13px;font-weight:600;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03)}
+  .back:hover{color:var(--txt);border-color:rgba(120,150,255,.4)}
+  h1{font-size:clamp(26px,5vw,36px);margin:22px 0 6px;letter-spacing:-.02em}
+  h1 span{background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .updated{color:var(--dim);font-size:13px;margin-bottom:26px}
+  h2{font-size:16px;margin:26px 0 8px;color:#fff}
+  p,li{color:#c3cbe6;font-size:14.5px}
+  ul{padding-left:20px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:18px 0}
+  .note{border-color:rgba(255,159,69,.35);background:rgba(255,159,69,.08)}
+  .note b{color:#ffcf9a}
+  a.inline{color:#9dc0ff}
+  footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);color:var(--dim);font-size:13px;display:flex;gap:14px;flex-wrap:wrap}
+  footer a{color:var(--dim);text-decoration:none;border-bottom:1px dotted rgba(154,166,200,.5)}
+  footer a:hover{color:var(--txt)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← Back to LEVEL UP</a>
+  <h1>Privacy <span>Policy</span></h1>
+  <div class="updated">Last updated: 8 November 2026</div>
+
+  <p>This policy describes what LEVEL UP stores, why, and what it does not do. It reflects the application as it actually runs today — not planned features.</p>
+
+  <h2>1. Information we store</h2>
+  <ul>
+    <li><b>Account details:</b> your name, email address and membership plan.</li>
+    <li><b>Password:</b> stored only as a salted hash. Your plain-text password is never saved or emailed.</li>
+    <li><b>Session cookie:</b> a signed cookie that keeps you logged in. It is HTTP-only and is cleared when you log out.</li>
+    <li><b>Billing records (test mode only):</b> plan, invoice amount and the last four digits of a card. Full card numbers and security codes are never stored.</li>
+  </ul>
+
+  <h2>2. Where your progress is stored</h2>
+  <div class="card">
+    <p>Your habits, assignments, workouts, sports goals, XP and profile settings are saved in your browser's local storage, under a key unique to your account (<code>levelup_state_v1:&lt;account id&gt;</code>).</p>
+    <p>This means your data survives refreshes and logins on the same browser, and stays separate from other accounts on that browser. It is <b>not yet synced to a server</b>, so it does not follow you to another device or browser. Clearing browser data removes it.</p>
+  </div>
+
+  <h2>3. What we do not do</h2>
+  <ul>
+    <li>We do not sell or rent your data.</li>
+    <li>We do not run third-party advertising or analytics trackers.</li>
+    <li>We do not send your content to an AI provider — the AI Coach currently returns built-in scripted sample replies.</li>
+    <li>We do not process real payments — billing is in test mode.</li>
+  </ul>
+
+  <h2>4. Your choices</h2>
+  <ul>
+    <li><b>Access and correction:</b> edit your name and goals from the Profile screen.</li>
+    <li><b>Deletion:</b> logging out clears the session; clearing your browser's site data removes locally stored progress. Account deletion is not automated yet — it currently requires operator assistance.</li>
+    <li><b>Demo mode:</b> exploring without an account keeps sample data in a separate guest storage key and creates no server account.</li>
+  </ul>
+
+  <h2>5. Children and safety</h2>
+  <p>LEVEL UP is intended for general fitness and study tracking. Fitness content is general information, not medical advice. If you are under the age required to consent to data processing where you live, use the app only with a parent or guardian.</p>
+
+  <div class="card note">
+    <b>In development:</b> cross-device sync, account deletion, and email-based password recovery are not connected yet. When they are, this policy will be updated before those features are enabled.
+  </div>
+
+  <footer>
+    <a href="/terms">Terms of Service</a>
+    <a href="/">LEVEL UP</a>
+  </footer>
+</div>
+</body>
+</html>
