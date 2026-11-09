@@ -103,7 +103,7 @@
     }
     appLoaded = true;
     const script = document.createElement('script');
-    script.src = '/app.js';
+    script.src = '/app.js?v=8';
     script.onload = () => {
       bindBillingRow();
       loadPlans().catch(() => {});
@@ -184,7 +184,7 @@
     }
     appLoaded = true;
     const script = document.createElement('script');
-    script.src = '/app.js';
+    script.src = '/app.js?v=8';
     script.onload = () => {
       bindBillingRow();
       loadPlans().catch(() => {});

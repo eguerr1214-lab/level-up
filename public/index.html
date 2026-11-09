@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/styles.css?v=8">
 </head>
 <body>
 <div class="phone" id="phone">
@@ -92,12 +92,12 @@
     <section class="screen active screen-stagger" id="screen-home">
       <header class="topbar">
         <div>
-          <div class="eyebrow" id="homeDate">Tuesday, Nov 12</div>
+          <div class="eyebrow" id="homeDate"></div>
           <h1 class="h1"><span id="greetWord">Good morning</span>,<br><span class="grad" id="homeName">there</span></h1>
         </div>
         <button class="avatar-btn" data-goto="profile" aria-label="Profile">
-          <div class="avatar" id="homeAvatar">A</div>
-          <span class="lvl-pin" id="homeLevelPin">7</span>
+          <div class="avatar" id="homeAvatar">?</div>
+          <span class="lvl-pin" id="homeLevelPin">1</span>
         </button>
       </header>
 
@@ -122,16 +122,16 @@
           <div class="hero-copy">
             <div class="hero-kicker">TODAY'S MOMENTUM</div>
             <div class="hero-title" id="heroTitle">You're on track</div>
-            <p id="heroSub">3 of 5 goals complete. Keep the chain alive.</p>
-            <div class="xp-mini"><span class="dot"></span><span id="heroXp">+70 XP earned today</span></div>
+            <p id="heroSub">Complete a goal to start your momentum.</p>
+            <div class="xp-mini"><span class="dot"></span><span id="heroXp">0 XP earned today</span></div>
           </div>
         </div>
         <div class="hero-foot">
-          <div class="hf"><b id="hfGoals">3/5</b><span>goals</span></div>
+          <div class="hf"><b id="hfGoals">0/0</b><span>goals</span></div>
           <div class="sep"></div>
-          <div class="hf"><b id="hfWorkout">1</b><span>workout</span></div>
+          <div class="hf"><b id="hfWorkout">0</b><span>workout</span></div>
           <div class="sep"></div>
-          <div class="hf"><b id="hfFocus">45m</b><span>focus</span></div>
+          <div class="hf"><b id="hfFocus">0m</b><span>focus</span></div>
         </div>
       </div>
 
@@ -141,7 +141,7 @@
           <div><b>AI Coach</b><span>Personalized for today</span></div>
           <button class="ai-open" id="openCoachTop">Open</button>
         </div>
-        <p class="ai-rec" id="aiRec">You have <b>2 assignments</b> due this week, so I moved your training to 5:30 PM — right after your study block.</p>
+        <p class="ai-rec" id="aiRec">Add a goal or habit and your coach will suggest a plan for today.</p>
         <div class="ai-tags" id="aiTags"></div>
         <div class="ai-actions">
           <button data-coach="Build my plan for today">Plan my day</button>
@@ -150,7 +150,7 @@
         </div>
       </div>
 
-      <div class="sec-head"><h2 class="h2">Daily goals</h2><span class="meta" id="goalsCount">0/5</span></div>
+      <div class="sec-head"><h2 class="h2">Daily goals</h2><span class="meta" id="goalsCount">0/0</span></div>
       <div class="card list-card" id="taskList"></div>
 
       <div class="sec-head"><h2 class="h2">Today's training</h2><button class="link" data-goto="fitness">All plans →</button></div>
@@ -159,15 +159,15 @@
       <div class="sec-head"><h2 class="h2">Study block</h2><button class="link" data-goto="school">School →</button></div>
       <div class="card study-card" id="homeStudy"></div>
 
-      <div class="sec-head"><h2 class="h2">Healthy habits</h2><span class="meta" id="habitCount">0/4</span></div>
+      <div class="sec-head"><h2 class="h2">Healthy habits</h2><span class="meta" id="habitCount">0/0</span></div>
       <div class="card habit-card">
         <div class="water-box">
-          <div class="water-top"><b>💧 Hydration</b><span id="waterLabel">3 / 8 glasses</span></div>
+          <div class="water-top"><b>💧 Hydration</b><span id="waterLabel">0 / 8 glasses</span></div>
           <div class="water-row" id="waterRow"></div>
         </div>
         <div id="habitList"></div>
         <button class="btn ghost full sm" id="addHabitBtn" style="margin-top:12px">＋ Add your own habit</button>
-        <div class="row-between" style="margin-top:14px"><span class="tiny" style="letter-spacing:1.1px">LAST 14 DAYS</span><span class="tiny" id="habitConsistency" style="color:#9FB6FF;font-weight:600">86% this month</span></div>
+        <div class="row-between" style="margin-top:14px"><span class="tiny" style="letter-spacing:1.1px">LAST 14 DAYS</span><span class="tiny" id="habitConsistency" style="color:#9FB6FF;font-weight:600">No data yet</span></div>
         <div class="heat" id="habitHeat"></div>
       </div>
 
@@ -694,6 +694,6 @@
   <div class="confetti-layer" id="confettiLayer"></div>
 </div>
 
-<script src="/account.js" defer></script>
+<script src="/account.js?v=8" defer></script>
 </body>
 </html>
