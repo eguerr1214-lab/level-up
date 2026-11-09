@@ -275,7 +275,7 @@ function defaultState(isDemo){
     assignments: demo ? defaultAssignments() : [],
     grades: demo ? defaultGrades() : [],
     workoutHistory: [],
-    workoutSchedule: defaultWorkoutSchedule('Beginner'),
+    workoutSchedule: demo ? defaultWorkoutSchedule('Beginner') : [],
     scheduleCustom: false,
     sportSchedules: {},
     sportGoals: {},
@@ -390,7 +390,7 @@ function migrateState(saved, base, isAccount){
     s.weekMinutes = [0,0,0,0,0,0,0];
   }
   if (!Array.isArray(s.workoutSchedule) || !s.workoutSchedule.length) {
-    s.workoutSchedule = defaultWorkoutSchedule(s.difficulty);
+    s.workoutSchedule = s.demo ? defaultWorkoutSchedule(s.difficulty) : [];
   }
   s.scheduleCustom = !!saved.scheduleCustom;
 
@@ -504,18 +504,19 @@ function currentSport(){ return SPORTS[state.sport] || SPORTS.Basketball; }
 function sportName(){ return state.sport || state.sports[0] || 'Basketball'; }
 
 function getCards(){ return [...FLASHCARDS, ...(state.customCards || [])]; }
+/* Daily goals are built from what this account actually set up: its own habits,
+   assignments, training plan and hydration goal. A brand-new account has no
+   preset checklist of another person's plan. */
 function makeTasks(){
-  const w = currentWorkout();
-  const sport = currentSport();
-  const habitName = (state.habits[0] && state.habits[0].name) || 'Morning routine';
-  const firstAssign = state.assignments.find(a => !a.done) || state.assignments[0];
-  return [
-    { id:'morning', label:`${habitName} — 5 min reset`, sub:'Habits · Mindset', xp:15, icon:'🌅' },
-    { id:'workout', label:`${w.name}`, sub:`Fitness · ${w.dur} min`, xp:40, icon:'💪' },
-    { id:'study', label:`${firstAssign ? firstAssign.subject : 'Study'} focus — 25 min`, sub:'School · Focus timer', xp:30, icon:'📚' },
-    { id:'drills', label:`${sportName()} — ${sport.drills[0].n}`, sub:`Sports · ${sport.focus}`, xp:25, icon:'🏆' },
-    { id:'water', label:`Hydrate — ${state.waterGoal} glasses`, sub:'Habits · Recovery', xp:15, icon:'💧' }
-  ];
+  const tasks = [];
+  const habit = (state.habits || [])[0];
+  if (habit) tasks.push({ id:'morning', label:`${habit.name} — 5 min reset`, sub:'Habits · Mindset', xp:15, icon:'🌅' });
+  const plan = (state.workoutSchedule || [])[nowParts().mondayIndex];
+  if (plan && Number(plan.minutes) > 0) tasks.push({ id:'workout', label: plan.title, sub:`Fitness · ${plan.minutes} min`, xp:40, icon:'💪' });
+  const nextA = (state.assignments || []).find(a => !a.done);
+  if (nextA) tasks.push({ id:'study', label:`${nextA.subject} — ${nextA.title || 'focus'}`, sub:'School · Focus timer', xp:30, icon:'📚' });
+  if (Number(state.waterGoal) > 0) tasks.push({ id:'water', label:`Hydrate — ${state.waterGoal} glasses`, sub:'Habits · Recovery', xp:15, icon:'💧' });
+  return tasks;
 }
 function taskById(id){ return makeTasks().find(t => t.id === id); }
 function tasksDoneCount(){ return makeTasks().filter(t => state.tasksDone[t.id]).length; }
@@ -658,6 +659,12 @@ function recordWorkout(entry){
   state.workoutHistory = [rec, ...(state.workoutHistory || [])].slice(0, 120);
   const { mondayIndex } = nowParts();
   state.weekMinutes[mondayIndex] = (state.weekMinutes[mondayIndex] || 0) + rec.minutes;
+  // Real activity earns the reward: a workout logged from the player, a plan row
+  // or the manual sheet pays out once per day even if no goal was pre-scheduled.
+  if (!state.tasksDone.workout) {
+    state.tasksDone.workout = true;
+    awardXp(`workout:${todayKey()}`, 40, 'Workout', '💪', { silent: true });
+  }
   return rec;
 }
 function workoutsThisWeek(){
@@ -938,7 +945,16 @@ function renderHome(){
 
   /* workout card */
   const w = currentWorkout();
-  $('#homeWorkout').innerHTML = `
+  const todayPlan = (state.workoutSchedule || [])[nowParts().mondayIndex];
+  $('#homeWorkout').innerHTML = (!todayPlan || !Number(todayPlan.minutes)) ? `
+    <div class="wk-body">
+      <div class="h3">No workout planned today</div>
+      <div class="tiny" style="margin-top:6px">Choose a plan or log a session to start tracking real progress.</div>
+      <div class="row-between" style="margin-top:14px">
+        <button class="btn primary sm" data-goto="fitness">Browse plans</button>
+        <button class="btn ghost sm" data-log-workout-manual>Log a workout</button>
+      </div>
+    </div>` : `
     <div class="wk-visual">
       <span class="wk-tag">${w.tag} · ${state.difficulty}</span>
       <span class="wk-emoji">${w.emoji}</span>
@@ -1032,12 +1048,14 @@ function renderAiRecommendation(){
   const w = currentWorkout();
   const sp = currentSport();
   const studyLine = a
-    ? `Your <b>${esc(a.subject.toLowerCase())} work</b> is due ${esc(a.due.toLowerCase())}, so I placed a 25-min focus block at 4:00 PM and moved training to <b>5:30 PM</b>.`
-    : `Everything is submitted, so you have a clear runway today.`;
-  const rec = `${studyLine} Recovery is 82%, so today is <b>${esc(w.focus.toLowerCase())}</b> — quality over volume, then 10 minutes of mobility.`;
+    ? `Your <b>${esc(a.subject.toLowerCase())}</b> work is due ${esc(a.due.toLowerCase())}, so a 25-minute focus block fits before training.`
+    : ((state.assignments || []).length
+        ? `Everything on your planner is submitted, so you have a clear runway today.`
+        : `Add an assignment to your planner and study blocks can be planned around it.`);
+  const rec = `${studyLine} Suggested focus: <b>${esc(w.focus.toLowerCase())}</b> — quality over volume, then 10 minutes of mobility.`;
   $('#aiRec').innerHTML = rec;
   $('#aiTags').innerHTML = [
-    `⚖️ School-aware`, `⏱️ ${esc(state.time)}`, `${sp.emoji} ${esc(sportName())}`, `😴 Recovery 82%`
+    `⚖️ School-aware`, `⏱️ ${esc(state.time)}`, `${sp.emoji} ${esc(sportName())}`, `📋 Preview plan`
   ].map(t => `<span>${t}</span>`).join('');
 }
 
@@ -1081,7 +1099,9 @@ function renderFitness(){
   $('#weekSummary').textContent = `${workoutsThisWeek().length} workouts · ${weekMinutesTotal()} min`;
 
   const sched = state.workoutSchedule;
-  $('#planList').innerHTML = sched.map((s, i) => {
+  $('#planList').innerHTML = !sched.length
+    ? `<div class="empty-note">No weekly training plan yet — open <b>All plans</b> to add training days.</div>`
+    : sched.map((s, i) => {
     const isToday = i === mondayIndex;
     const logged = isToday && !!state.tasksDone.workout;
     const rest = !s.minutes;
